@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS tweets CASCADE;
 CREATE TABLE tweets(
   id serial PRIMARY KEY NOT NULL,
   tweet_text varchar(140) NOT NULL CHECK (char_length(tweet_text) <= 140),
-  creator_id integer REFERENCES users(id) ON DELETE CASCADE,
+  creator_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at timestamp NOT NULL,
   image_url varchar(100)
 );
@@ -36,7 +36,9 @@ CREATE TABLE reports(
   id serial PRIMARY KEY NOT NULL,
   type varchar(10) DEFAULT 'tweets',
   reported_id integer NOT NULL,
-  created_at timestamp NOT NULL
+  creator_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at timestamp NOT NULL,
+  UNIQUE (reported_id, creator_id)
 );
 
 DROP TABLE IF EXISTS favorites CASCADE;
@@ -45,7 +47,8 @@ CREATE TABLE favorites(
   id serial PRIMARY KEY NOT NULL,
   tweet_id integer REFERENCES tweets(id) ON DELETE CASCADE,
   user_id integer REFERENCES users(id) ON DELETE CASCADE,
-  created_at timestamp NOT NULL
+  created_at timestamp NOT NULL,
+  UNIQUE (tweet_id, user_id)
 );
 
 DROP TABLE IF EXISTS retweets CASCADE;
@@ -54,7 +57,8 @@ CREATE TABLE retweets(
   id serial PRIMARY KEY NOT NULL,
   tweet_id integer REFERENCES tweets(id) ON DELETE CASCADE,
   user_id integer REFERENCES users(id) ON DELETE CASCADE,
-  created_at timestamp NOT NULL
+  created_at timestamp NOT NULL,
+  UNIQUE (tweet_id, user_id)
 );
 
 DROP TABLE IF EXISTS followships CASCADE;
@@ -64,7 +68,8 @@ CREATE TABLE followships(
   user_id integer REFERENCES users(id) ON DELETE CASCADE,
   follower_id integer REFERENCES users(id) ON DELETE CASCADE,
   confirmed boolean DEFAULT '1', -- pending 0 and confirmed 1
-  created_at timestamp NOT NULL
+  created_at timestamp NOT NULL,
+  UNIQUE (user_id, follower_id)
 );
 
 DROP TABLE IF EXISTS lists CASCADE;
