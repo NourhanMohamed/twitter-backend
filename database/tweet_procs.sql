@@ -1,7 +1,7 @@
-CREATE OR REPLACE FUNCTION create_tweet(tweet_text varchar(140), created_at timestamp)
+CREATE OR REPLACE FUNCTION create_tweet(tweet_text varchar(140), creator_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
-    INSERT INTO tweets(tweet_text, created_at) VALUES (tweet_text, created_at);
+    INSERT INTO tweets(tweet_text, creator_id, created_at) VALUES (tweet_text, creator_id, created_at);
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -97,5 +97,21 @@ DECLARE cursor refcursor := 'cur';
     FROM favorites F INNER JOIN users U ON F.user_id = U.id
     WHERE F.tweet_id = $1;
     RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+-- ???????????????????????????????????????????????????????????????????????
+CREATE OR REPLACE FUNCTION reply(tweet_id integer, tweet_text varchar(140), created_at timestamp)
+RETURNS void AS $$
+  BEGIN
+    SELECT create_tweet(tweet_text, $3);
+    INSERT INTO replies VALUES (tweet_id, reply_id, created_at);
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION report_tweet(reported_id integer, creator_id integer, created_at timestamp)
+RETURNS void AS $$
+  BEGIN
+    INSERT INTO reports(reported_id, creator_id, created_at) VALUES (reported_id, creator_id, created_at);
   END; $$
 LANGUAGE PLPGSQL;
