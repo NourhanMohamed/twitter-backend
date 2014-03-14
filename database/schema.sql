@@ -93,3 +93,12 @@ CREATE TABLE direct_messages(
   read boolean DEFAULT '0', -- read 1 and unread 0
   created_at timestamp NOT NULL
 );
+
+DROP TABLE IF EXISTS replies CASCADE;
+
+CREATE TABLE replies(
+  id serial PRIMARY KEY NOT NULL,
+  original_tweet_id integer REFERENCES tweets(id) ON DELETE CASCADE,
+  reply_id integer REFERENCES tweets(id) ON DELETE CASCADE,
+  created_at timestamp NOT NULL
+);
