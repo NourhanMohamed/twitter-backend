@@ -22,18 +22,6 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION get_tweets(user_id integer)
-RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur';
-  BEGIN
-    OPEN cursor FOR
-    SELECT * FROM tweets T INNER JOIN users U ON T.creator_id = U.id
-    WHERE T.creator_id = user_id
-    ORDER BY T.created_at DESC;
-    RETURN cursor;
-  END; $$
-LANGUAGE PLPGSQL;
-
 CREATE OR REPLACE FUNCTION favourite_tweet(tweet_id integer, user_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
