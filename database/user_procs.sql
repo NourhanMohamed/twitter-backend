@@ -20,7 +20,7 @@ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_user(user_id integer)
 RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur'
+DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT * FROM users U WHERE U.id = user_id LIMIT 1;
@@ -30,7 +30,7 @@ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_users(user_substring integer)
 RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur'
+DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name FROM users U
@@ -74,7 +74,7 @@ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_followers(user_id integer)
 RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur'
+DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name
@@ -86,7 +86,7 @@ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_following(user_id integer)
 RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur'
+DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name
@@ -96,7 +96,71 @@ DECLARE cursor refcursor := 'cur'
   END; $$
 LANGUAGE PLPGSQL;
 
+CREATE OR REPLACE FUNCTION get_tweets(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name
+    FROM tweets T INNER JOIN users U ON T.creator_id = U.id
+    WHERE T.creator_id = user_id
+    ORDER BY T.created_at DESC;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
 
+CREATE OR REPLACE FUNCTION get_user_retweets(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name 
+    FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id
+      INNER JOIN users U ON R.user_id = U.id
+    WHERE U.id = $1
+    ORDER BY R.created_at DESC;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION get_user_favorites(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name 
+    FROM tweets T INNER JOIN favorites F ON T.id = F.tweet_id
+      INNER JOIN users U ON F.user_id = U.id
+    WHERE U.id = $1
+    ORDER BY F.created_at DESC;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+-- Should be changed to fetch my subscribed lists, too
+CREATE OR REPLACE FUNCTION get_user_lists(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT L.id, L.name, L.description, U.name, U.username, U.avatar_file_name 
+    FROM lists L INNER JOIN users U ON L.creator_id = U.id
+    WHERE U.id = $1;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION get_mentions(username varchar(30))
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name
+    FROM tweets T INNER JOIN users U ON T.creator_id = U.id
+    WHERE T.text LIKE '%@'+$1+'%'
+    ORDER BY T.created_at DESC;
+  END; $$
+LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION report_user(reported_id integer, creator_id integer, created_at timestamp)
 RETURNS void AS $$
