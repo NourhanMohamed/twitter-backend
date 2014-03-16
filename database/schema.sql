@@ -84,6 +84,26 @@ CREATE TABLE lists(
   -- how to store included tweeps and list subscribers?
 );
 
+DROP TABLE IF EXISTS subscriptions CASCADE;
+
+CREATE TABLE subscriptions(
+  id serial PRIMARY KEY NOT NULL,
+  subscriber_id integer REFERENCES users(id) ON DELETE CASCADE,
+  list_id integer REFERENCES lists(id) ON DELETE CASCADE,
+  created_at timestamp NOT NULL,
+  UNIQUE(subscriber_id, list_id)
+);
+
+DROP TABLE IF EXISTS memberships CASCADE;
+
+CREATE TABLE memberships(
+  id serial PRIMARY KEY NOT NULL,
+  member_id integer REFERENCES users(id) ON DELETE CASCADE,
+  list_id integer REFERENCES lists(id) ON DELETE CASCADE,
+  created_at timestamp NOT NULL,
+  UNIQUE(member_id, list_id)
+);
+
 DROP TABLE IF EXISTS direct_messages CASCADE;
 
 CREATE TABLE direct_messages(
