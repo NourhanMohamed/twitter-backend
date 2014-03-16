@@ -169,3 +169,12 @@ RETURNS void AS $$
     VALUES (reported_id, creator_id, created_at, 'users');
   END; $$
 LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION is_private_user(user_id integer)
+RETURNS integer AS $$
+  BEGIN
+    DECLARE is_private boolean;
+    SELECT U.private INTO is_private FROM users U WHERE U.id = $1;
+    RETURN is_private;
+  END; $$
+LANGUAGE PLPGSQL;
