@@ -87,3 +87,5 @@ DECLARE cursor refcursor := 'cur';
     RETRUN cursor;
   END; $$
 LANGUAGE PLPGSQL;
+
+-- Get list feeds
