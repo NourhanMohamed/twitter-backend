@@ -22,7 +22,7 @@ DECLARE cursor refcursor := 'cur';
     SELECT * FROM direct_messages D
     WHERE (D.sender_id = $1 AND D.reciever_id = $2) OR
       (D.sender_id = $2 AND D.reciever_id = $1);
-    RETRUN cursor;
+    RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -35,6 +35,6 @@ DECLARE cursor refcursor := 'cur';
     SELECT * FROM direct_messages D
     WHERE D.sender_id = $1 OR D.reciever_id = $1
     ORDER BY D.created_at DESC; 
-    RETRUN cursor;
+    RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;

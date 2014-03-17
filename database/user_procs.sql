@@ -24,7 +24,7 @@ DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT * FROM users U WHERE U.id = user_id LIMIT 1;
-    RETRUN cursor; 
+    RETURN cursor; 
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -42,9 +42,9 @@ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION follow(user_id integer, follower_id integer,
   created_at timestamp)
 RETURNS void AS $$
+DECLARE private_user boolean;
   BEGIN
-    DECLARE private_user boolean;
-    SELECT U.private INTO private_user FROM users U
+    SELECT U.protected_tweets INTO private_user FROM users U
     WHERE U.id = $1;
 
     IF private_user THEN
@@ -92,7 +92,7 @@ DECLARE cursor refcursor := 'cur';
     SELECT U.username, U.name, U.avatar_file_name
     FROM users U INNER JOIN followships F ON U.id = F.user_id
     WHERE F.follower_id = $1 AND F.confirmed = '1';
-    RETRUN cursor;
+    RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -172,9 +172,9 @@ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION is_private_user(user_id integer)
 RETURNS integer AS $$
+DECLARE is_private boolean;
   BEGIN
-    DECLARE is_private boolean;
-    SELECT U.private INTO is_private FROM users U WHERE U.id = $1;
+    SELECT U.protected_tweets INTO is_private FROM users U WHERE U.id = $1;
     RETURN is_private;
   END; $$
 LANGUAGE PLPGSQL;
