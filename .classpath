@@ -2,5 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/Users/nour/Downloads/activemq-all-5.9.0.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-dbcp2-2.0/commons-dbcp2-2.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-dbcp2-2.0/commons-dbcp2-2.0.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-pool2-2.2/commons-pool2-2.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-pool2-2.2/commons-pool2-2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/postgresql-9.3-1101.jdbc41.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
