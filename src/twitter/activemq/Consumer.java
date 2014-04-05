@@ -1,54 +1,42 @@
 package twitter.activemq;
+
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQConnectionFactory;
+public class Consumer implements MessageListener {
 
-public class Consumer {
-    // URL of the JMS server
-    private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+	public Consumer() throws JMSException {
+		ActiveMQConfig config1 = new ActiveMQConfig("TEST.QUEUE");
+		Connection conn = config1.connect();
+		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-    // Name of the queue we will receive messages from
-    private static String subject = "TEST.QUEUE";
+		Destination destination = session.createQueue(config1.getQueueName());
+		MessageConsumer consumer = session.createConsumer(destination);
+		consumer.setMessageListener(this);
+	}
 
-    public static void main(String[] args) throws JMSException {
-        // Getting JMS connection from the server
-        ConnectionFactory connectionFactory
-            = new ActiveMQConnectionFactory(url);
-        Connection connection = connectionFactory.createConnection();
-        connection.start();
+	public static void main(String[] args) throws JMSException {
+		new Consumer();
+	}
 
-        // Creating session for sending messages
-        Session session = connection.createSession(false,
-            Session.AUTO_ACKNOWLEDGE);
-
-        // Getting the queue 'TESTQUEUE'
-        Destination destination = session.createQueue(subject);
-
-        // MessageConsumer is used for receiving (consuming) messages
-        MessageConsumer consumer = session.createConsumer(destination);
-
-        // Here we receive the message.
-        // By default this call is blocking, which means it will wait
-        // for a message to arrive on the queue.
-        Message message = consumer.receive();
-
-        // There are many types of Message and TextMessage
-        // is just one of them. Producer sent us a TextMessage
-        // so we must cast to it to get access to its .getText()
-        // method.
-        if (message instanceof TextMessage) {
-            TextMessage textMessage = (TextMessage) message;
-            System.out.println("Received message '"
-                + textMessage.getText() + "'");
-        }
-        connection.close();
-    }
+	@Override
+	public void onMessage(Message message) {
+		// TODO Auto-generated method stub
+		String messageText = null;
+		try {
+			if (message instanceof TextMessage) {
+				TextMessage textMessage = (TextMessage) message;
+				messageText = textMessage.getText();
+				System.out.println("messageText = " + messageText);
+			}
+		} catch (JMSException e) {
+			// Handle the exception appropriately
+		}
+	}
 }
