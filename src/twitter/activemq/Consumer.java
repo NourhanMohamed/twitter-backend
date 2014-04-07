@@ -10,19 +10,28 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 public class Consumer implements MessageListener {
+	ActiveMQConfig config;
+	Connection conn;
 
-	public Consumer() throws JMSException {
-		ActiveMQConfig config1 = new ActiveMQConfig("TEST.QUEUE");
-		Connection conn = config1.connect();
+	public Consumer(ActiveMQConfig config) throws JMSException {
+		this.config = config;
+	}
+	
+	public void connect() throws JMSException {
+		conn = config.connect();
 		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-		Destination destination = session.createQueue(config1.getQueueName());
+		Destination destination = session.createQueue(config.getQueueName());
 		MessageConsumer consumer = session.createConsumer(destination);
 		consumer.setMessageListener(this);
 	}
+	
+	public void disconnect() throws JMSException {
+		conn.close();
+	}
 
 	public static void main(String[] args) throws JMSException {
-		new Consumer();
+		new Consumer(new ActiveMQConfig("TEST.QUEUE"));
 	}
 
 	@Override
