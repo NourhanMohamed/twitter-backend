@@ -8,5 +8,9 @@
 	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-pool2-2.2/commons-pool2-2.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/commons-pool2-2.2/commons-pool2-2.2.jar"/>
 	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/postgresql-9.3-1101.jdbc41.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/json/jackson-core-asl-1.9.13-javadoc.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/json/jackson-core-asl-1.9.13.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/json/jackson-mapper-asl-1.9.13-javadoc.jar"/>
+	<classpathentry kind="lib" path="/Users/nour/Documents/Bachelor Egypt/json/jackson-mapper-asl-1.9.13.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
