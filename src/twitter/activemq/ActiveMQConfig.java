@@ -30,7 +30,4 @@ public class ActiveMQConfig {
 	public String getQueueName() {
 		return this.queueName;
 	}
-	// for session creation
-	// Session session = connection.createSession(false,
-	// Session.AUTO_ACKNOWLEDGE);
 }

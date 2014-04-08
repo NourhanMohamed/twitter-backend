@@ -1,5 +1,9 @@
 package twitter.activemq;
 
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -9,7 +13,13 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import twitter.shared.InvalidAppException;
+import twitter.shared.JsonMapper;
+import twitter.shared.TweetMain;
+import twitter.shared.UserMain;
+
 public class Consumer implements MessageListener {
+	Logger lgr = Logger.getLogger(Consumer.class.getName());
 	ActiveMQConfig config;
 	Connection conn;
 
@@ -18,7 +28,7 @@ public class Consumer implements MessageListener {
 	}
 	
 	public void connect() throws JMSException {
-		conn = config.connect();
+		Connection conn = config.connect();
 		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 		Destination destination = session.createQueue(config.getQueueName());
@@ -27,11 +37,7 @@ public class Consumer implements MessageListener {
 	}
 	
 	public void disconnect() throws JMSException {
-		conn.close();
-	}
-
-	public static void main(String[] args) throws JMSException {
-		new Consumer(new ActiveMQConfig("TEST.QUEUE"));
+		config.disconnect(conn);
 	}
 
 	@Override
@@ -42,10 +48,25 @@ public class Consumer implements MessageListener {
 			if (message instanceof TextMessage) {
 				TextMessage textMessage = (TextMessage) message;
 				messageText = textMessage.getText();
-				System.out.println("messageText = " + messageText);
+				System.out.println("Recieved Message: " + messageText);
+				handleMessage(messageText);
 			}
 		} catch (JMSException e) {
-			// Handle the exception appropriately
+			lgr.log(Level.SEVERE, e.getMessage(), e);
+		} catch (InvalidAppException e) {
+			lgr.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+	
+	private void handleMessage(String msg) throws InvalidAppException{
+		JsonMapper json = new JsonMapper(msg);
+		Map<String,String> map = json.deserialize();
+		String app = map.get("app");
+		switch (app) {
+		case "user": UserMain.handleMap(map); break;
+		case "tweet": TweetMain.handleMap(map); break;
+		default:
+			throw new InvalidAppException("Application "+ app + " is not available.");
 		}
 	}
 }
