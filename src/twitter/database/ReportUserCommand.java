@@ -12,7 +12,7 @@ import org.postgresql.util.PSQLException;
 public class ReportUserCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(ReportUserCommand.class
 			.getName());
-	HashMap<String, String> map;
+	private HashMap<String, String> map;
 	
 	@Override
 	public void setMap(HashMap<String, String> map) {

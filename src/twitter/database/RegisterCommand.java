@@ -12,7 +12,7 @@ import org.postgresql.util.PSQLException;
 public class RegisterCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
 			.getName());
-	HashMap<String, String> map;
+	private HashMap<String, String> map;
 	
 	@Override
 	public void setMap(HashMap<String, String> map) {

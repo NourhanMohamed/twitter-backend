@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class UnFollowCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(UnFollowCommand.class
 			.getName());
-	HashMap<String, String> map;
+	private HashMap<String, String> map;
 
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
