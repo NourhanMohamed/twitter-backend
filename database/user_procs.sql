@@ -1,3 +1,4 @@
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION create_user(username varchar(30),
   email varchar(100),
   password varchar(150),
@@ -15,8 +16,8 @@ RETURNS void AS $$
 BEGIN
   FOR i IN array_lower(params, 1)..array_upper(params, 1) LOOP
     UPDATE users U 
-    SET array[i][1] = array[i][2]
-    WHERE U.id = user_id
+    SET params[i][1] = params[i][2]
+    WHERE U.id = user_id;
   END LOOP;
 END; $$
 LANGUAGE PLPGSQL;
@@ -42,6 +43,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION follow(user_id integer, follower_id integer,
   created_at timestamp)
 RETURNS void AS $$
@@ -60,6 +62,7 @@ DECLARE private_user boolean;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION unfollow(user_id integer, follower_id integer)
 RETURNS void AS $$
   BEGIN
@@ -67,11 +70,12 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION confirm_follow(user_id integer, follower_id integer)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION confirm_follow(userid integer, followerid integer)
 RETURNS void AS $$
   BEGIN
-    UPDATE followships F SET F.confirmed = '1'
-    WHERE F.user_id = $1 AND F.follower_id = $2;
+    UPDATE followships SET confirmed = TRUE
+    WHERE user_id = $1 AND follower_id = $2;
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -165,6 +169,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION report_user(reported_id integer, creator_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
@@ -173,6 +178,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA NOT NEEDED
 CREATE OR REPLACE FUNCTION is_private_user(user_id integer)
 RETURNS integer AS $$
 DECLARE is_private boolean;

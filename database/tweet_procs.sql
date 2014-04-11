@@ -23,44 +23,52 @@ DECLARE cursor refcursor := 'cur';
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION favourite_tweet(tweet_id integer, user_id integer, created_at timestamp)
-RETURNS void AS $$
+RETURNS integer AS $$
   BEGIN
     INSERT INTO favorites(tweet_id, user_id, created_at) VALUES (tweet_id, user_id, created_at);
+    RETURN get_favorites_count(tweet_id);
   END; $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION unfavourite_tweet(tweet_id integer, user_id integer)
-RETURNS void AS $$
+RETURNS integer AS $$
   BEGIN
     DELETE FROM favorites F WHERE F.tweet_id = $1 AND F.user_id = $2;
+    RETURN get_favorites_count(tweet_id);
   END; $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION retweet_tweet(tweet_id integer, user_id integer, created_at timestamp)
-RETURNS void AS $$
+RETURNS integer AS $$
   BEGIN
     INSERT INTO retweets(tweet_id, user_id, created_at) VALUES (tweet_id, user_id, created_at);
+    RETURN get_retweets_count(tweet_id);
   END; $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION unretweet_tweet(tweet_id integer, user_id integer)
-RETURNS void AS $$
+RETURNS integer AS $$
   BEGIN
     DELETE FROM retweets R WHERE R.tweet_id = $1 AND R.user_id = $2;
+    RETURN get_retweets_count(tweet_id);
   END; $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_retweets_count(tweet_id integer)
 RETURNS integer AS $$
+DECLARE res integer;
   BEGIN
-    SELECT count(*) FROM retweets R WHERE R.tweet_id = $1; 
+    SELECT count(*) INTO res FROM retweets R WHERE R.tweet_id = $1;
+    RETURN res;
   END; $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION get_favorites_count(tweet_id integer)
 RETURNS integer AS $$
+DECLARE res integer;
   BEGIN
-    SELECT count(*) FROM favorites F WHERE F.tweet_id = $1; 
+    SELECT count(*) INTO res FROM favorites F WHERE F.tweet_id = $1;
+    RETURN res;
   END; $$
 LANGUAGE PLPGSQL;
 
