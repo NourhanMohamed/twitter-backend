@@ -29,6 +29,7 @@ public class Consumer implements MessageListener {
 	
 	public void connect() throws JMSException {
 		Connection conn = config.connect();
+		this.conn = conn;
 		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 		Destination destination = session.createQueue(config.getQueueName());
@@ -54,6 +55,8 @@ public class Consumer implements MessageListener {
 		} catch (JMSException e) {
 			lgr.log(Level.SEVERE, e.getMessage(), e);
 		} catch (InvalidAppException e) {
+			lgr.log(Level.SEVERE, e.getMessage(), e);
+		} catch (Exception e) {
 			lgr.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
