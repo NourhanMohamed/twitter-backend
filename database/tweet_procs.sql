@@ -1,3 +1,4 @@
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION create_tweet(tweet_text varchar(140), creator_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
@@ -5,6 +6,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION delete_tweet(tweet_id integer)
 RETURNS void AS $$
   BEGIN
@@ -22,7 +24,8 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION favourite_tweet(tweet_id integer, user_id integer, created_at timestamp)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION favorite(tweet_id integer, user_id integer, created_at timestamp)
 RETURNS integer AS $$
   BEGIN
     INSERT INTO favorites(tweet_id, user_id, created_at) VALUES (tweet_id, user_id, created_at);
@@ -30,7 +33,8 @@ RETURNS integer AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION unfavourite_tweet(tweet_id integer, user_id integer)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION unfavorite(tweet_id integer, user_id integer)
 RETURNS integer AS $$
   BEGIN
     DELETE FROM favorites F WHERE F.tweet_id = $1 AND F.user_id = $2;
@@ -38,15 +42,21 @@ RETURNS integer AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION retweet_tweet(tweet_id integer, user_id integer, created_at timestamp)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION retweet(tweet_id integer, user_id integer, created_at timestamp)
 RETURNS integer AS $$
+DECLARE temp integer;
   BEGIN
-    INSERT INTO retweets(tweet_id, user_id, created_at) VALUES (tweet_id, user_id, created_at);
+    SELECT T.creator_id INTO temp FROM tweets T WHERE T.id = $1 LIMIT 1;
+    IF temp != user_id THEN
+      INSERT INTO retweets(tweet_id, user_id, created_at) VALUES (tweet_id, user_id, created_at);
+    END IF;
     RETURN get_retweets_count(tweet_id);
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION unretweet_tweet(tweet_id integer, user_id integer)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION unretweet(tweet_id integer, user_id integer)
 RETURNS integer AS $$
   BEGIN
     DELETE FROM retweets R WHERE R.tweet_id = $1 AND R.user_id = $2;
@@ -54,6 +64,7 @@ RETURNS integer AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_retweets_count(tweet_id integer)
 RETURNS integer AS $$
 DECLARE res integer;
@@ -63,6 +74,7 @@ DECLARE res integer;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_favorites_count(tweet_id integer)
 RETURNS integer AS $$
 DECLARE res integer;
@@ -105,6 +117,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION report_tweet(reported_id integer, creator_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
