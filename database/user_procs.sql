@@ -32,13 +32,14 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION get_users(user_substring integer)
+-- JAVA DONE
+CREATE OR REPLACE FUNCTION get_users(user_substring text)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name FROM users U
-    WHERE U.name LIKE '%'+$1+'%' OR U.username LIKE '%'+$1+'%';
+    WHERE U.name LIKE '%' || $1 || '%' OR U.username LIKE '%' || $1 || '%';
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
@@ -79,6 +80,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_followers(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -86,11 +88,12 @@ DECLARE cursor refcursor := 'cur';
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name
     FROM users U INNER JOIN followships F ON U.id = F.follower_id
-    WHERE F.user_id = $1 AND F.confirmed = '1';
+    WHERE F.user_id = $1 AND F.confirmed = TRUE;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_following(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -98,7 +101,20 @@ DECLARE cursor refcursor := 'cur';
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name
     FROM users U INNER JOIN followships F ON U.id = F.user_id
-    WHERE F.follower_id = $1 AND F.confirmed = '1';
+    WHERE F.follower_id = $1 AND F.confirmed = TRUE;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+--JAVA DONE
+CREATE OR REPLACE FUNCTION get_unconfirmed_followers(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT U.username, U.name, U.avatar_file_name
+    FROM users U INNER JOIN followships F ON U.id = F.user_id
+    WHERE F.follower_id = $1 AND F.confirmed = FALSE;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
