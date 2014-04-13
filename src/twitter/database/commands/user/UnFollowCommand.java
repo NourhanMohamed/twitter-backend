@@ -1,4 +1,4 @@
-package twitter.database;
+package twitter.database.commands.user;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
 
 public class UnFollowCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(UnFollowCommand.class

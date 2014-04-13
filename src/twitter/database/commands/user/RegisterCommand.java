@@ -1,4 +1,4 @@
-package twitter.database;
+package twitter.database.commands.user;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class ReportTweetCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(ReportTweetCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class RegisterCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -26,17 +29,22 @@ public class ReportTweetCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{call report_tweet(?,?,now()::timestamp)}");
+					.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
 			proc.setPoolable(true);
 
-			proc.setInt(1, Integer.parseInt(map.get("reported_id")));
-			proc.setInt(2, Integer.parseInt(map.get("creator_id")));
+			proc.setString(1, map.get("username"));
+			proc.setString(2, map.get("email"));
+			proc.setString(3, map.get("password"));
+			proc.setString(4, map.get("name"));
 			proc.execute();
 
 		} catch (PSQLException e) {
 			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("unique constraint")) {
-				System.out.println("You already reported this tweet");
+				if (e.getMessage().contains("(username)"))
+					System.out.println("Username already exists");
+				if (e.getMessage().contains("(email)"))
+					System.out.println("Email already exists");
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -50,3 +58,4 @@ public class ReportTweetCommand implements Command, Runnable {
 		execute();
 	}
 }
+

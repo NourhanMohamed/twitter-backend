@@ -12,9 +12,8 @@ public class Main {
 		CommandsMap.instantiate();
 		HashMap<String, String> map = new HashMap<>();
 		map.put("app", "user");
-		map.put("method", "retweet");
-		map.put("tweet_id", "27487");
-		map.put("user_id", "29");
+		map.put("method", "get_users");
+		map.put("user_substring", "a");
 
 		Class<?> cmdClass = CommandsMap.queryClass(map.get("method"));
 		if (cmdClass == null) {
