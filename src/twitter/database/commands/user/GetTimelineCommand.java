@@ -1,27 +1,66 @@
 package twitter.database.commands.user;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.postgresql.util.PSQLException;
 
 import twitter.database.Command;
+import twitter.database.PostgresConnection;
 
 public class GetTimelineCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(GetTimelineCommand.class
+			.getName());
+	private HashMap<String, String> map;
 
 	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-
+	public void setMap(HashMap<String, String> map) {
+		this.map = map;
 	}
 
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
+		try {
+			Connection dbConn = PostgresConnection.getDataSource()
+					.getConnection();
+			dbConn.setAutoCommit(false);
+			CallableStatement proc = dbConn
+					.prepareCall("{? = call get_tweets(?)}");
+			proc.setPoolable(true);
+			proc.registerOutParameter(1, Types.OTHER);
+			proc.setInt(2, Integer.parseInt(map.get("user_id")));
+			proc.execute();
 
+			ResultSet set = (ResultSet) proc.getObject(1);
+			while (set.next()) {
+				String tweet = set.getString(2);
+				String retweeter = set.getString(7);
+				String creator = set.getString(4);
+				if (creator.equals(retweeter)) {
+					System.out.println("Tweet = " + tweet + ", Created by = " + creator);
+				} else {
+					System.out.println("Tweet = " + tweet + ", Retweeted by = "
+							+ retweeter + ", Created by = " + creator);
+				}
+			}
+
+			dbConn.commit();
+		} catch (PSQLException e) {
+			// TODO generate JSON error messages instead of console logs
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 
 	@Override
-	public void setMap(HashMap<String, String> map) {
-		// TODO Auto-generated method stub
-
+	public void run() {
+		execute();
 	}
-
 }
