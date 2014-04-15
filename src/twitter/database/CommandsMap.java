@@ -19,6 +19,7 @@ import twitter.database.commands.user.RegisterCommand;
 import twitter.database.commands.user.ReportUserCommand;
 import twitter.database.commands.user.UnFollowCommand;
 import twitter.database.commands.user.UnconfirmedFollowersCommand;
+import twitter.database.commands.user.UpdateUserCommand;
 
 public class CommandsMap {
 	private static Map<String,Class<?>> cmdMap;
@@ -41,6 +42,7 @@ public class CommandsMap {
 		cmdMap.put("followers", FollowersCommand.class);
 		cmdMap.put("following", FollowingCommand.class);
 		cmdMap.put("unconfirmed_followers", UnconfirmedFollowersCommand.class);
+		cmdMap.put("update_user", UpdateUserCommand.class);
 		
 //		cmdMap.put("get_tweet", );
 //		cmdMap.put("get_retweeters");
