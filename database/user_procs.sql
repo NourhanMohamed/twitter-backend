@@ -24,6 +24,8 @@ BEGIN
 END; $$
 LANGUAGE PLPGSQL;
 
+
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_user(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -108,7 +110,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
---JAVA DONE
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_unconfirmed_followers(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -121,41 +123,50 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_tweets(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url
+    (SELECT T.id, T.tweet_text, T.image_url, U.name, U.username, U.avatar_url, U.name AS "my_name"
     FROM tweets T INNER JOIN users U ON T.creator_id = U.id
     WHERE T.creator_id = user_id
-    ORDER BY T.created_at DESC;
+    ORDER BY T.created_at DESC)
+    UNION
+    (SELECT T.id, T.tweet_text, T.image_url, C.name, C.username, C.avatar_url, U.name AS "my_name"
+    FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id 
+      INNER JOIN users U ON R.user_id = U.id INNER JOIN users C ON T.creator_id = C.id
+    WHERE U.id = $1
+    ORDER BY R.created_at DESC);
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- NOT USED
 CREATE OR REPLACE FUNCTION get_user_retweets(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url 
-    FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id
-      INNER JOIN users U ON R.user_id = U.id
+    SELECT T.id, T.tweet_text, T.image_url, C.name, C.username, C.avatar_url, U.name AS "my_name"
+    FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id 
+      INNER JOIN users U ON R.user_id = U.id INNER JOIN users C ON T.creator_id = C.id
     WHERE U.id = $1
     ORDER BY R.created_at DESC;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_user_favorites(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url 
+    SELECT T.id, T.tweet_text, T.image_url, C.name, C.username, C.avatar_url, U.name AS "my_name" 
     FROM tweets T INNER JOIN favorites F ON T.id = F.tweet_id
-      INNER JOIN users U ON F.user_id = U.id
+      INNER JOIN users U ON F.user_id = U.id INNER JOIN users C ON T.creator_id = C.id 
     WHERE U.id = $1
     ORDER BY F.created_at DESC;
     RETURN cursor;
@@ -175,15 +186,17 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION get_mentions(username varchar(30))
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url
+    SELECT T.id, T.tweet_text, T.image_url, U.name, U.username, U.avatar_url
     FROM tweets T INNER JOIN users U ON T.creator_id = U.id
-    WHERE T.text LIKE '%@'+$1+'%'
+    WHERE T.tweet_text LIKE '%@' || $1 || '%'
     ORDER BY T.created_at DESC;
+    RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
