@@ -3,21 +3,22 @@ CREATE OR REPLACE FUNCTION create_user(username varchar(30),
   email varchar(100),
   password varchar(150),
   name varchar(100),
-  created_at timestamp)
+  created_at timestamp,
+  avatar_url varchar(70) DEFAULT null)
 RETURNS void AS $$
   BEGIN
-    INSERT INTO users(username, email, encrypted_password, name, created_at)
-    VALUES (username, email, password, name, created_at);
+    INSERT INTO users(username, email, encrypted_password, name, created_at, avatar_file_name)
+    VALUES (username, email, password, name, created_at, avatar_url);
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION edit_user(user_id integer, params TEXT[2][])
+CREATE OR REPLACE FUNCTION edit_user(user_id integer, params TEXT[][2])
 RETURNS void AS $$
 BEGIN
   FOR i IN array_lower(params, 1)..array_upper(params, 1) LOOP
-    UPDATE users U 
-    SET params[i][1] = params[i][2]
-    WHERE U.id = user_id;
+    EXECUTE 'UPDATE users' ||
+      ' SET ' || quote_ident(params[i][1]) || ' = ' || quote_literal(params[i][2]) ||
+      ' WHERE id = ' || user_id || ';';
   END LOOP;
 END; $$
 LANGUAGE PLPGSQL;
@@ -113,8 +114,8 @@ DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
     SELECT U.username, U.name, U.avatar_file_name
-    FROM users U INNER JOIN followships F ON U.id = F.user_id
-    WHERE F.follower_id = $1 AND F.confirmed = FALSE;
+    FROM users U INNER JOIN followships F ON U.id = F.follower_id
+    WHERE F.user_id = $1 AND F.confirmed = FALSE;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
