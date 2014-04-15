@@ -67,7 +67,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.name, U.username, U.avatar_file_name
+    SELECT U.name, U.username, U.avatar_url
     FROM lists L INNER JOIN subscriptions S ON L.id = S.list_id
       INNER JOIN users U ON U.id = S.subscriber_id
     WHERE L.id = list_id;
@@ -80,7 +80,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.name, U.username, U.avatar_file_name
+    SELECT U.name, U.username, U.avatar_url
     FROM lists L INNER JOIN memberships M ON L.id = M.list_id
       INNER JOIN users U ON U.id = M.member_id
     WHERE L.id = list_id;

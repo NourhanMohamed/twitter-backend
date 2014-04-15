@@ -89,7 +89,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
+    SELECT U.username, U.name, U.avatar_url
     FROM retweets R INNER JOIN users U ON R.user_id = U.id
     WHERE R.tweet_id = $1;
     RETURN cursor;
@@ -101,7 +101,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
+    SELECT U.username, U.name, U.avatar_url
     FROM favorites F INNER JOIN users U ON F.user_id = U.id
     WHERE F.tweet_id = $1;
     RETURN cursor;

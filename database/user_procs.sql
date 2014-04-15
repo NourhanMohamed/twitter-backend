@@ -7,11 +7,12 @@ CREATE OR REPLACE FUNCTION create_user(username varchar(30),
   avatar_url varchar(70) DEFAULT null)
 RETURNS void AS $$
   BEGIN
-    INSERT INTO users(username, email, encrypted_password, name, created_at, avatar_file_name)
+    INSERT INTO users(username, email, encrypted_password, name, created_at, avatar_url)
     VALUES (username, email, password, name, created_at, avatar_url);
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE
 CREATE OR REPLACE FUNCTION edit_user(user_id integer, params TEXT[][2])
 RETURNS void AS $$
 BEGIN
@@ -39,7 +40,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name FROM users U
+    SELECT U.username, U.name, U.avatar_url FROM users U
     WHERE U.name LIKE '%' || $1 || '%' OR U.username LIKE '%' || $1 || '%';
     RETURN cursor;
   END; $$
@@ -87,7 +88,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
+    SELECT U.username, U.name, U.avatar_url
     FROM users U INNER JOIN followships F ON U.id = F.follower_id
     WHERE F.user_id = $1 AND F.confirmed = TRUE;
     RETURN cursor;
@@ -100,7 +101,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
+    SELECT U.username, U.name, U.avatar_url
     FROM users U INNER JOIN followships F ON U.id = F.user_id
     WHERE F.follower_id = $1 AND F.confirmed = TRUE;
     RETURN cursor;
@@ -113,7 +114,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
+    SELECT U.username, U.name, U.avatar_url
     FROM users U INNER JOIN followships F ON U.id = F.follower_id
     WHERE F.user_id = $1 AND F.confirmed = FALSE;
     RETURN cursor;
@@ -125,7 +126,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url
     FROM tweets T INNER JOIN users U ON T.creator_id = U.id
     WHERE T.creator_id = user_id
     ORDER BY T.created_at DESC;
@@ -138,7 +139,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name 
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url 
     FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id
       INNER JOIN users U ON R.user_id = U.id
     WHERE U.id = $1
@@ -152,7 +153,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name 
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url 
     FROM tweets T INNER JOIN favorites F ON T.id = F.tweet_id
       INNER JOIN users U ON F.user_id = U.id
     WHERE U.id = $1
@@ -167,7 +168,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT L.id, L.name, L.description, U.name, U.username, U.avatar_file_name 
+    SELECT L.id, L.name, L.description, U.name, U.username, U.avatar_url 
     FROM lists L INNER JOIN users U ON L.creator_id = U.id
     WHERE U.id = $1;
     RETURN cursor;
@@ -179,7 +180,7 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_file_name
+    SELECT T.id, T.text, T.image_url, U.name, U.username, U.avatar_url
     FROM tweets T INNER JOIN users U ON T.creator_id = U.id
     WHERE T.text LIKE '%@'+$1+'%'
     ORDER BY T.created_at DESC;
