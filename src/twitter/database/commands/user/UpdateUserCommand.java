@@ -1,9 +1,16 @@
 package twitter.database.commands.user;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,8 +19,8 @@ import org.postgresql.util.PSQLException;
 import twitter.database.Command;
 import twitter.database.PostgresConnection;
 
-public class RegisterCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
+public class UpdateUserCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(UpdateUserCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -29,23 +36,27 @@ public class RegisterCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			
-			CallableStatement proc;
-			if(map.containsKey("avatar_url")){
-				proc = dbConn.prepareCall("{call create_user(?,?,?,?,now()::timestamp, ?)}");
-			
-			} else {
-				proc = dbConn.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
-			}
-			
+			CallableStatement proc = dbConn.prepareCall("{call edit_user(?,?)}");
+
 			proc.setPoolable(true);
-			proc.setString(1, map.get("username"));
-			proc.setString(2, map.get("email"));
-			proc.setString(3, map.get("password"));
-			proc.setString(4, map.get("name"));
+			proc.setInt(1, Integer.parseInt(map.get("user_id")));
+			map.remove("user_id");
+			map.remove("app");
+			map.remove("method");
+			Set<Entry<String,String>> set = map.entrySet();
+			System.out.println(Arrays.toString(set.toArray()));
+			Iterator<Entry<String,String>> iterator = set.iterator();
+			String[][] arraySet = new String[set.size()][2];
+			int i = 0;
 			
-			if(map.containsKey("avatar_url")) {
-				proc.setString(5, map.get("avatar_url"));
+			while(iterator.hasNext()) {
+				Entry<String,String> entry = iterator.next();
+				String[] temp = {entry.getKey(), entry.getValue()};
+				arraySet[i] = temp;
+				i++;
 			}
+			Array array = dbConn.createArrayOf("text", arraySet);
+			proc.setArray(2, array);
 			
 			proc.execute();
 
@@ -69,4 +80,3 @@ public class RegisterCommand implements Command, Runnable {
 		execute();
 	}
 }
-
