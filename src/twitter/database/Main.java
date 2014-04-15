@@ -12,9 +12,9 @@ public class Main {
 		CommandsMap.instantiate();
 		HashMap<String, String> map = new HashMap<>();
 		map.put("app", "user");
-		map.put("method", "get_users");
-		map.put("user_substring", "a");
-
+		map.put("method", "timeline");
+		map.put("user_id", "1");
+		
 		Class<?> cmdClass = CommandsMap.queryClass(map.get("method"));
 		if (cmdClass == null) {
 			LOGGER.log(Level.SEVERE,
