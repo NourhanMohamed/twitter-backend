@@ -80,7 +80,7 @@ public class CommandsMap {
 		cmdMap.put("delete_list", DeleteListCommand.class);
 		cmdMap.put("delete_member", DeleteMemberCommand.class);
 		cmdMap.put("list_members", GetListMembersCommand.class);	
-		cmdMap.put("list_subscribers", GetListSubscribersCommand.class);
+		cmdMap.put("list_subscribers", GetListsubscribersCommand.class);
 		cmdMap.put("subscribe", SubscribeCommand.class);
 		cmdMap.put("unsubscribe", UnSubscribeCommand.class);
 		cmdMap.put("update_list", UpdateListCommand.class);
