@@ -1,18 +1,29 @@
 package twitter.database.commands.user;
 
+import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
 
 import twitter.database.Command;
+import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
+import twitter.database.Tweet;
+import twitter.database.User;
+import twitter.shared.MyObjectMapper;
 
 public class GetTimelineCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(GetTimelineCommand.class
@@ -38,23 +49,59 @@ public class GetTimelineCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
+			
+			MyObjectMapper mapper = new MyObjectMapper();
+			JsonNodeFactory nf = JsonNodeFactory.instance;
+			ObjectNode root = nf.objectNode();
+			ArrayNode tweets = nf.arrayNode();
+			root.put("app", map.get("app"));
+			root.put("method", map.get("method"));
+			root.put("status", "ok");
+			root.put("code", "200");
+			
 			while (set.next()) {
+				Integer id = set.getInt(1);
 				String tweet = set.getString(2);
-				String retweeter = set.getString(7);
-				String creator = set.getString(4);
-				if (creator.equals(retweeter)) {
-					System.out.println("Tweet = " + tweet + ", Created by = " + creator);
-				} else {
-					System.out.println("Tweet = " + tweet + ", Retweeted by = "
-							+ retweeter + ", Created by = " + creator);
-				}
+				String image_url = set.getString(3);
+				Timestamp created_at = set.getTimestamp(4);
+				String creator_name = set.getString(5);
+				String creator_username = set.getString(6);
+				String creator_avatar = set.getString(7);
+				
+				Tweet t = new Tweet();
+				t.setId(id);
+				t.setTweetText(tweet);
+				t.setImageUrl(image_url);
+				t.setCreatedAt(created_at);
+				User creator = new User();
+				creator.setName(creator_name);
+				creator.setAvatarUrl(creator_avatar);
+				creator.setUsername(creator_username);
+				t.setCreator(creator);
+
+				tweets.addPOJO(t);
+			}
+			
+			root.put("tweets", tweets);
+			try {
+				CommandsHelp.submit(map.get("app"),
+						mapper.writeValueAsString(root), LOGGER);
+			} catch (JsonGenerationException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (JsonMappingException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 			dbConn.commit();
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
