@@ -11,6 +11,8 @@ public class Tweet {
 	private User creator;
 	private User retweeter;
 	private User favoriter;
+	private Integer retweets;
+	private Integer favorites;
 	
 	public void setId(Integer id) {
 		this.id = id;
@@ -32,5 +34,11 @@ public class Tweet {
 	}
 	public void setFavoriter(User favoriter) {
 		this.favoriter = favoriter;
+	}
+	public void setRetweets(Integer retweets) {
+		this.retweets = retweets;
+	}
+	public void setFavorites(Integer favorites) {
+		this.favorites = favorites;
 	}
 }
