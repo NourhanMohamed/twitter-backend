@@ -76,12 +76,17 @@ public class RegisterCommand implements Command, Runnable {
 
 		} catch (PSQLException e) {
 			if (e.getMessage().contains("unique constraint")) {
-				if (e.getMessage().contains("(username)"))
+				if (e.getMessage().contains("(username)")) {
 					CommandsHelp.handleError(map.get("app"), map.get("method"),
 							"Username already exists", LOGGER);
-				if (e.getMessage().contains("(email)"))
+				}
+				if (e.getMessage().contains("(email)")) {
 					CommandsHelp.handleError(map.get("app"), map.get("method"),
 							"Email already exists", LOGGER);
+				}
+			} else {
+				CommandsHelp.handleError(map.get("app"), map.get("method"),
+						e.getMessage(), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

@@ -65,6 +65,9 @@ public class ReportUserCommand implements Command, Runnable {
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"You already reported this user", LOGGER);
+			} else {
+				CommandsHelp.handleError(map.get("app"), map.get("method"),
+						e.getMessage(), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

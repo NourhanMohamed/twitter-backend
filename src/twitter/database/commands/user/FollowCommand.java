@@ -64,6 +64,9 @@ public class FollowCommand implements Command, Runnable {
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"Followship already exists", LOGGER);
+			} else {
+				CommandsHelp.handleError(map.get("app"), map.get("method"),
+						e.getMessage(), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

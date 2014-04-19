@@ -94,6 +94,9 @@ public class UpdateUserCommand implements Command, Runnable {
 				if (e.getMessage().contains("(email)"))
 					CommandsHelp.handleError(app, method,
 							"Email already exists", LOGGER);
+			} else {
+				CommandsHelp.handleError(app, method,
+						e.getMessage(), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
