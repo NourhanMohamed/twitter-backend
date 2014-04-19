@@ -29,7 +29,7 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public void setEncrypted_password(String encrypted_password) {
+	public void setEncryptedPassword(String encrypted_password) {
 		this.encrypted_password = encrypted_password;
 	}
 	public void setName(String name) {
@@ -47,22 +47,22 @@ public class User {
 	public void setWebsite(String website) {
 		this.website = website;
 	}
-	public void setCreated_at(Timestamp created_at) {
+	public void setCreatedAt(Timestamp created_at) {
 		this.created_at = created_at.toString();
 	}
-	public void setAvatar_url(String avatar_url) {
+	public void setAvatarUrl(String avatar_url) {
 		this.avatar_url = avatar_url;
 	}
 	public void setOverlay(Boolean overlay) {
 		this.overlay = overlay;
 	}
-	public void setLink_color(String link_color) {
+	public void setLinkColor(String link_color) {
 		this.link_color = link_color;
 	}
-	public void setBackground_color(String background_color) {
+	public void setBackgroundColor(String background_color) {
 		this.background_color = background_color;
 	}
-	public void setProtected_tweets(Boolean protected_tweets) {
+	public void setProtectedTweets(Boolean protected_tweets) {
 		this.protected_tweets = protected_tweets;
 	}
 }
