@@ -61,7 +61,7 @@ public class GetUsersCommand implements Command, Runnable {
 				String username = set.getString(1);
 				String name = set.getString(2);
 				String avatar_url = set.getString(3);
-				
+
 				User user = new User();
 				user.setUsername(username);
 				user.setName(name);

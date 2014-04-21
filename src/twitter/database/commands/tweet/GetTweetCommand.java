@@ -49,7 +49,7 @@ public class GetTweetCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -57,7 +57,7 @@ public class GetTweetCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
-			
+
 			Tweet t = new Tweet();
 			if (set.next()) {
 				Integer id = set.getInt(1);
@@ -69,8 +69,7 @@ public class GetTweetCommand implements Command, Runnable {
 				String creator_avatar = set.getString(8);
 				int retweets = set.getInt(9);
 				int favorites = set.getInt(10);
-				
-				
+
 				t.setId(id);
 				t.setTweetText(tweet);
 				t.setImageUrl(image_url);
@@ -83,7 +82,7 @@ public class GetTweetCommand implements Command, Runnable {
 				creator.setUsername(creator_username);
 				t.setCreator(creator);
 			}
-			
+
 			POJONode child = nf.POJONode(t);
 			root.put("tweet", child);
 			try {

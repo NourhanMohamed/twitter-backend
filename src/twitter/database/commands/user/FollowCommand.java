@@ -41,7 +41,7 @@ public class FollowCommand implements Command, Runnable {
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
 			proc.setInt(2, Integer.parseInt(map.get("follower_id")));
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();

@@ -49,7 +49,7 @@ public class GetFavoritesCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -58,7 +58,7 @@ public class GetFavoritesCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
-			
+
 			while (set.next()) {
 				Integer id = set.getInt(1);
 				String tweet = set.getString(2);
@@ -67,7 +67,7 @@ public class GetFavoritesCommand implements Command, Runnable {
 				String creator_name = set.getString(5);
 				String creator_username = set.getString(6);
 				String creator_avatar = set.getString(7);
-				
+
 				Tweet t = new Tweet();
 				t.setId(id);
 				t.setTweetText(tweet);
@@ -81,7 +81,7 @@ public class GetFavoritesCommand implements Command, Runnable {
 
 				tweets.addPOJO(t);
 			}
-			
+
 			root.put("favorites", tweets);
 			try {
 				CommandsHelp.submit(map.get("app"),
@@ -93,7 +93,7 @@ public class GetFavoritesCommand implements Command, Runnable {
 			} catch (IOException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
-			
+
 			dbConn.commit();
 		} catch (PSQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),

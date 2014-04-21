@@ -24,7 +24,7 @@ public class UnRetweetCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(UnRetweetCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -39,12 +39,12 @@ public class UnRetweetCommand implements Command, Runnable {
 			CallableStatement proc = dbConn
 					.prepareCall("{? = call unretweet(?,?)}");
 			proc.setPoolable(true);
-			
+
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.setInt(2, Integer.parseInt(map.get("tweet_id")));
 			proc.setInt(3, Integer.parseInt(map.get("user_id")));
 			proc.execute();
-			
+
 			int retweets = proc.getInt(1);
 
 			MyObjectMapper mapper = new MyObjectMapper();
@@ -76,7 +76,7 @@ public class UnRetweetCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

@@ -23,7 +23,7 @@ public class DeleteTweetCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(DeleteTweetCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -41,7 +41,7 @@ public class DeleteTweetCommand implements Command, Runnable {
 
 			proc.setInt(1, Integer.parseInt(map.get("tweet_id")));
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -70,7 +70,7 @@ public class DeleteTweetCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

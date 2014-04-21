@@ -48,7 +48,7 @@ public class GetUserCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -56,7 +56,7 @@ public class GetUserCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
-			
+
 			User user = new User();
 			if (set.next()) {
 				Integer id = set.getInt(1);

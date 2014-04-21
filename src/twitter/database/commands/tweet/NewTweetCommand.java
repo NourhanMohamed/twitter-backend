@@ -23,7 +23,7 @@ public class NewTweetCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(NewTweetCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -36,23 +36,25 @@ public class NewTweetCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc;
-			if(map.containsKey("image_url")){
-				proc = dbConn.prepareCall("{call create_tweet(?,?,now()::timestamp,?)}");
-			
+			if (map.containsKey("image_url")) {
+				proc = dbConn
+						.prepareCall("{call create_tweet(?,?,now()::timestamp,?)}");
+
 			} else {
-				proc = dbConn.prepareCall("{call create_tweet(?,?,now()::timestamp)}");
+				proc = dbConn
+						.prepareCall("{call create_tweet(?,?,now()::timestamp)}");
 			}
-			
+
 			proc.setPoolable(true);
 			proc.setString(1, map.get("tweet_text"));
 			proc.setInt(2, Integer.parseInt(map.get("creator_id")));
-			
-			if(map.containsKey("image_url")) {
+
+			if (map.containsKey("image_url")) {
 				proc.setString(3, map.get("image_url"));
 			}
-			
+
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -87,7 +89,7 @@ public class NewTweetCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

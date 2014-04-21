@@ -24,7 +24,7 @@ public class RetweetCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(RetweetCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -39,12 +39,12 @@ public class RetweetCommand implements Command, Runnable {
 			CallableStatement proc = dbConn
 					.prepareCall("{? = call retweet(?,?,now()::timestamp)}");
 			proc.setPoolable(true);
-			
+
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.setInt(2, Integer.parseInt(map.get("tweet_id")));
 			proc.setInt(3, Integer.parseInt(map.get("user_id")));
 			proc.execute();
-			
+
 			int retweets = proc.getInt(1);
 
 			MyObjectMapper mapper = new MyObjectMapper();
@@ -66,7 +66,6 @@ public class RetweetCommand implements Command, Runnable {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 
-
 		} catch (PSQLException e) {
 			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("unique constraint")) {
@@ -84,7 +83,7 @@ public class RetweetCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

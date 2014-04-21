@@ -28,7 +28,7 @@ public class UpdateUserCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(UpdateUserCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -42,32 +42,33 @@ public class UpdateUserCommand implements Command, Runnable {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
 			dbConn.setAutoCommit(true);
-			
-			CallableStatement proc = dbConn.prepareCall("{call edit_user(?,?)}");
+
+			CallableStatement proc = dbConn
+					.prepareCall("{call edit_user(?,?)}");
 
 			proc.setPoolable(true);
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
-			
+
 			map.remove("user_id");
 			map.remove("app");
 			map.remove("method");
-			Set<Entry<String,String>> set = map.entrySet();
+			Set<Entry<String, String>> set = map.entrySet();
 			System.out.println(Arrays.toString(set.toArray()));
-			Iterator<Entry<String,String>> iterator = set.iterator();
+			Iterator<Entry<String, String>> iterator = set.iterator();
 			String[][] arraySet = new String[set.size()][2];
 			int i = 0;
-			
-			while(iterator.hasNext()) {
-				Entry<String,String> entry = iterator.next();
-				String[] temp = {entry.getKey(), entry.getValue()};
+
+			while (iterator.hasNext()) {
+				Entry<String, String> entry = iterator.next();
+				String[] temp = { entry.getKey(), entry.getValue() };
 				arraySet[i] = temp;
 				i++;
 			}
 			Array array = dbConn.createArrayOf("text", arraySet);
 			proc.setArray(2, array);
-			
+
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -76,8 +77,8 @@ public class UpdateUserCommand implements Command, Runnable {
 			root.put("status", "ok");
 			root.put("code", "200");
 			try {
-				CommandsHelp.submit(app,
-						mapper.writeValueAsString(root), LOGGER);
+				CommandsHelp.submit(app, mapper.writeValueAsString(root),
+						LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -95,8 +96,7 @@ public class UpdateUserCommand implements Command, Runnable {
 					CommandsHelp.handleError(app, method,
 							"Email already exists", LOGGER);
 			} else {
-				CommandsHelp.handleError(app, method,
-						e.getMessage(), LOGGER);
+				CommandsHelp.handleError(app, method, e.getMessage(), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -104,7 +104,7 @@ public class UpdateUserCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

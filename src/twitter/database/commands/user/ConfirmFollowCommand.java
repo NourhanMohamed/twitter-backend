@@ -33,13 +33,14 @@ public class ConfirmFollowCommand implements Command, Runnable {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn.prepareCall("{call confirm_follow(?,?)}");
+			CallableStatement proc = dbConn
+					.prepareCall("{call confirm_follow(?,?)}");
 			proc.setPoolable(true);
 
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
 			proc.setInt(2, Integer.parseInt(map.get("follower_id")));
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -57,7 +58,7 @@ public class ConfirmFollowCommand implements Command, Runnable {
 			} catch (IOException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
-			
+
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), LOGGER);

@@ -47,7 +47,7 @@ public class FollowersCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -56,12 +56,12 @@ public class FollowersCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
-			
+
 			while (set.next()) {
 				String username = set.getString(1);
 				String name = set.getString(2);
 				String avatar_url = set.getString(3);
-				
+
 				User user = new User();
 				user.setUsername(username);
 				user.setName(name);
@@ -69,7 +69,7 @@ public class FollowersCommand implements Command, Runnable {
 
 				usersArray.addPOJO(user);
 			}
-			
+
 			root.put("followers", usersArray);
 			try {
 				CommandsHelp.submit(map.get("app"),

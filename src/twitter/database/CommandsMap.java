@@ -28,10 +28,10 @@ import twitter.database.commands.user.UnconfirmedFollowersCommand;
 import twitter.database.commands.user.UpdateUserCommand;
 
 public class CommandsMap {
-	private static Map<String,Class<?>> cmdMap;
-	
-	public static void instantiate(){
-		cmdMap = new HashMap<String,Class<?>>();
+	private static Map<String, Class<?>> cmdMap;
+
+	public static void instantiate() {
+		cmdMap = new HashMap<String, Class<?>>();
 		cmdMap.put("register", RegisterCommand.class);
 		cmdMap.put("follow", FollowCommand.class);
 		cmdMap.put("unfollow", UnFollowCommand.class);
@@ -56,8 +56,8 @@ public class CommandsMap {
 		cmdMap.put("get_favorites", GetFavoritesCommand.class);
 		cmdMap.put("get_feeds", GetFeedsCommand.class);
 	}
-	
-	public static Class<?> queryClass(String cmd){
+
+	public static Class<?> queryClass(String cmd) {
 		return cmdMap.get(cmd);
 	}
 }

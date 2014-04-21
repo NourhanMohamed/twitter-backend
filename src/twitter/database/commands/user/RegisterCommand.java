@@ -23,7 +23,7 @@ public class RegisterCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -35,27 +35,29 @@ public class RegisterCommand implements Command, Runnable {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
 			dbConn.setAutoCommit(true);
-			
+
 			CallableStatement proc;
-			if(map.containsKey("avatar_url")){
-				proc = dbConn.prepareCall("{call create_user(?,?,?,?,now()::timestamp, ?)}");
-			
+			if (map.containsKey("avatar_url")) {
+				proc = dbConn
+						.prepareCall("{call create_user(?,?,?,?,now()::timestamp, ?)}");
+
 			} else {
-				proc = dbConn.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
+				proc = dbConn
+						.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
 			}
-			
+
 			proc.setPoolable(true);
 			proc.setString(1, map.get("username"));
 			proc.setString(2, map.get("email"));
 			proc.setString(3, map.get("password"));
 			proc.setString(4, map.get("name"));
-			
-			if(map.containsKey("avatar_url")) {
+
+			if (map.containsKey("avatar_url")) {
 				proc.setString(5, map.get("avatar_url"));
 			}
-			
+
 			proc.execute();
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -96,10 +98,9 @@ public class RegisterCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();
 	}
 }
-
