@@ -16,6 +16,7 @@ import twitter.database.commands.user.FollowCommand;
 import twitter.database.commands.user.FollowersCommand;
 import twitter.database.commands.user.FollowingCommand;
 import twitter.database.commands.user.GetFavoritesCommand;
+import twitter.database.commands.user.GetFeedsCommand;
 import twitter.database.commands.user.GetMentionsCommand;
 import twitter.database.commands.user.GetTimelineCommand;
 import twitter.database.commands.user.GetUserCommand;
@@ -53,6 +54,7 @@ public class CommandsMap {
 		cmdMap.put("get_tweet", GetTweetCommand.class);
 		cmdMap.put("timeline", GetTimelineCommand.class);
 		cmdMap.put("get_favorites", GetFavoritesCommand.class);
+		cmdMap.put("get_feeds", GetFeedsCommand.class);
 	}
 	
 	public static Class<?> queryClass(String cmd){
