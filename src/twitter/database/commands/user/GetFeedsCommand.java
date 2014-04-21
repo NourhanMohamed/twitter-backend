@@ -26,7 +26,7 @@ import twitter.database.User;
 import twitter.shared.MyObjectMapper;
 
 public class GetFeedsCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(GetTimelineCommand.class
+	private final Logger LOGGER = Logger.getLogger(GetFeedsCommand.class
 			.getName());
 	private HashMap<String, String> map;
 
