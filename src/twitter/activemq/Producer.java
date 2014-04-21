@@ -1,4 +1,5 @@
 package twitter.activemq;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -7,11 +8,11 @@ import javax.jms.Session;
 
 public class Producer {
 	ActiveMQConfig config;
-	
-	public Producer(ActiveMQConfig config){
+
+	public Producer(ActiveMQConfig config) {
 		this.config = config;
 	}
-	
+
 	public void send(String msg) throws JMSException {
 		Connection conn = config.connect();
 		Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
