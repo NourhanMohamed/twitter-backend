@@ -14,7 +14,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
--- JAVA DONE
+-- JAVA DONE / JSON DONE
 CREATE OR REPLACE FUNCTION get_tweet(tweet_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -27,6 +27,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- NOT USED
 CREATE OR REPLACE FUNCTION get_retweets(tweet_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -40,6 +41,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- NOT USED
 CREATE OR REPLACE FUNCTION get_favorites(tweet_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';

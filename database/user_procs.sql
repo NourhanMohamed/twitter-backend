@@ -129,16 +129,37 @@ RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    (SELECT T.id, T.tweet_text, T.image_url, T.created_at, U.name, U.username, U.avatar_url
-    FROM tweets T INNER JOIN users U ON T.creator_id = U.id
-    WHERE T.creator_id = user_id
-    ORDER BY T.created_at DESC)
-    UNION
-    (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url
-    FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id 
-      INNER JOIN users U ON R.user_id = U.id INNER JOIN users C ON T.creator_id = C.id
-    WHERE U.id = $1
-    ORDER BY R.created_at DESC);
+    SELECT id, tweet_text, image_url, created_at, name, username, avatar_url
+    FROM (
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, U.name, U.username, U.avatar_url, T.created_at AS "creation"
+      FROM tweets T INNER JOIN users U ON T.creator_id = U.id
+      WHERE T.creator_id = $1)
+      UNION
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url, R.created_at AS "creation"
+      FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id 
+        INNER JOIN users U ON R.user_id = U.id INNER JOIN users C ON T.creator_id = C.id
+      WHERE U.id = $1)) AS timeline
+    ORDER BY creation DESC;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION get_feeds(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT id, tweet_text, image_url, created_at, name, username, avatar_url, name2
+    FROM (
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url, C.name AS "name2", T.created_at AS "creation"
+      FROM tweets T INNER JOIN users C ON T.creator_id = C.id INNER JOIN followships F ON C.id = F.user_id
+      WHERE F.confirmed = TRUE AND F.follower_id = $1)
+      UNION
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url, U.name AS "name2", R.created_at AS "creation"
+      FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id INNER JOIN users C ON T.creator_id = C.id
+        INNER JOIN followships F ON R.user_id = F.user_id INNER JOIN users U ON U.id = F.user_id
+      WHERE F.confirmed = TRUE AND F.follower_id = $1)) AS feeds
+    ORDER BY creation DESC;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
