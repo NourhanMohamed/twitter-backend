@@ -26,6 +26,7 @@ import twitter.database.commands.user.ReportUserCommand;
 import twitter.database.commands.user.UnFollowCommand;
 import twitter.database.commands.user.UnconfirmedFollowersCommand;
 import twitter.database.commands.user.UpdateUserCommand;
+		
 
 public class CommandsMap {
 	private static Map<String, Class<?>> cmdMap;
@@ -55,6 +56,21 @@ public class CommandsMap {
 		cmdMap.put("timeline", GetTimelineCommand.class);
 		cmdMap.put("get_favorites", GetFavoritesCommand.class);
 		cmdMap.put("get_feeds", GetFeedsCommand.class);
+		
+		cmdMap.put("new_message", CreateDmCommand.class);
+		cmdMap.put("delete_message", DeleteDmCommand.class);
+		cmdMap.put("get_conversation", GetConversationCommand.class);
+		cmdMap.put("get_conversations", GetConversationsCommand.class);
+
+		cmdMap.put("add_member", AddMemberCommand.class);
+		cmdMap.put("create_list", CreateListCommand.class);
+		cmdMap.put("delete_list", DeleteListCommand.class);
+		cmdMap.put("delete_member", DeleteMemberCommand.class);
+		cmdMap.put("list_members", GetListMembersCommand.class);	
+		cmdMap.put("list_subscribers", GetListSubscribersCommand.class);
+		cmdMap.put("subscribe", SubscribeCommand.class);
+		cmdMap.put("unsubscribe", UnSubscribeCommand.class);
+		cmdMap.put("update_list", UpdateListCommand.class);
 	}
 
 	public static Class<?> queryClass(String cmd) {
