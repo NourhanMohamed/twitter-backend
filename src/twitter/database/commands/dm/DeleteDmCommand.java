@@ -1,4 +1,4 @@
-package twitter.database;
+package twitter.database.commands.dm;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class DeleteTweetCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(DeleteTweetCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class DeleteDmCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(DeleteDmCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -26,10 +29,10 @@ public class DeleteTweetCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{call delete_tweet(?)}");
+					.prepareCall("{call delete_dm(?)}");
 			proc.setPoolable(true);
 
-			proc.setInt(1, Integer.parseInt(map.get("tweet_id")));
+			proc.setInt(1, Integer.parseInt(map.get("dm_id")));
 			proc.execute();
 
 		} catch (PSQLException e) {
@@ -44,5 +47,6 @@ public class DeleteTweetCommand implements Command, Runnable {
 	public void run() {
 		execute();
 	}
+
 
 }

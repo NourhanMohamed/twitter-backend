@@ -1,4 +1,4 @@
-package twitter.database;
+package twitter.database.commands.list;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class ReportTweetCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(ReportTweetCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class UpdateListCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(UpdateListCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -26,19 +29,16 @@ public class ReportTweetCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{call report_tweet(?,?,now()::timestamp)}");
+					.prepareCall("{call update_list(?,?,?,?)}");
 			proc.setPoolable(true);
 
-			proc.setInt(1, Integer.parseInt(map.get("reported_id")));
-			proc.setInt(2, Integer.parseInt(map.get("creator_id")));
+			proc.setInt(1, Integer.parseInt(map.get("user_id")));
+			proc.setString(2, map.get("name"));
+			proc.setString(3, map.get("description"));
+			proc.setBoolean(4, Boolean.getBoolean(map.get("private")));		
 			proc.execute();
 
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
-			if (e.getMessage().contains("unique constraint")) {
-				System.out.println("You already reported this tweet");
-			}
-
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -49,4 +49,7 @@ public class ReportTweetCommand implements Command, Runnable {
 	public void run() {
 		execute();
 	}
+
+	
+
 }

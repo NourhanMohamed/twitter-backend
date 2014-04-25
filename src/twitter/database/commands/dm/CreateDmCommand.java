@@ -1,4 +1,4 @@
-package twitter.database;
+package twitter.database.commands.dm;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class RegisterCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class CreateDmCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(CreateDmCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -26,24 +29,19 @@ public class RegisterCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
+					.prepareCall("{call create_list(?,?,?,?,now()::timestamp)}");
 			proc.setPoolable(true);
-
-			proc.setString(1, map.get("username"));
-			proc.setString(2, map.get("email"));
-			proc.setString(3, map.get("password"));
-			proc.setString(4, map.get("name"));
+			proc.setInt(1, Integer.parseInt(map.get("sender_id")));
+			proc.setInt(2, Integer.parseInt(map.get("reciever_id")));
+			proc.setString(3, map.get("dm_text"));
+			proc.setString(4, map.get("image_url"));
 			proc.execute();
 
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
-			if (e.getMessage().contains("unique constraint")) {
-				if (e.getMessage().contains("(username)"))
-					System.out.println("Username already exists");
-				if (e.getMessage().contains("(email)"))
-					System.out.println("Email already exists");
+			if (e.getMessage().contains("value too long")) {
+				if (e.getMessage().contains("(dm_text)"))
+					System.out.println("list name exceeds 50 characters");
 			}
-
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -55,4 +53,3 @@ public class RegisterCommand implements Command, Runnable {
 		execute();
 	}
 }
-

@@ -11,9 +11,7 @@ CREATE TABLE users(
   bio varchar(160) CHECK (char_length(bio) <= 160),
   website varchar(60),
   created_at timestamp NOT NULL,
-  avatar_file_name varchar(70),
-  avatar_content_type varchar(30),
-  avatar_file_size integer,
+  avatar_url varchar(70),
   overlay boolean DEFAULT '0', -- white 0 and black 1
   link_color varchar(10),
   background_color varchar(10),

@@ -1,19 +1,25 @@
-package twitter.database;
+package twitter.database.commands.list;
+
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class NewTweetCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(NewTweetCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class GetListMembersCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(GetListMembersCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -24,29 +30,34 @@ public class NewTweetCommand implements Command, Runnable {
 		try {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
-			dbConn.setAutoCommit(true);
+			dbConn.setAutoCommit(false);
 			CallableStatement proc = dbConn
-					.prepareCall("{call create_tweet(?,?,now()::timestamp)}");
+					.prepareCall("{? = call get_list_members(?)}");
 			proc.setPoolable(true);
-
-			proc.setString(1, map.get("tweet_text"));
-			proc.setInt(2, Integer.parseInt(map.get("creator_id")));
+			proc.registerOutParameter(1, Types.OTHER);
+			proc.setInt(1, Integer.parseInt(map.get("list_id")));
 			proc.execute();
 
+			ResultSet set = (ResultSet) proc.getObject(1);
+			while (set.next()) {
+				String name = set.getString(1);
+				String username = set.getString(2);
+				String avatar = set.getString(3);
+				System.out.println("name = " + name + ", username = "
+						+ username + ", avatar = " + avatar);
+			}
+
+			dbConn.commit();
 		} catch (PSQLException e) {
 			// TODO generate JSON error messages instead of console logs
-			if (e.getMessage().contains("value too long")) {
-				System.out.println("Tweet exceeds 140 characters");
-			}
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();
 	}
-
 }

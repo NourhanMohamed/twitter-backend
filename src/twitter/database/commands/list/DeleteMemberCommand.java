@@ -1,17 +1,19 @@
-package twitter.database;
+package twitter.database.commands.list;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.postgresql.util.PSQLException;
 
-public class FavoriteCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(FavoriteCommand.class
+import twitter.database.Command;
+import twitter.database.PostgresConnection;
+
+public class DeleteMemberCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(DeleteMemberCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -27,21 +29,14 @@ public class FavoriteCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{? = call favorite(?,?,now()::timestamp)}");
+					.prepareCall("{call delete_member(?,?)}");
 			proc.setPoolable(true);
-			
-			proc.registerOutParameter(1, Types.INTEGER);
-			proc.setInt(2, Integer.parseInt(map.get("tweet_id")));
-			proc.setInt(3, Integer.parseInt(map.get("user_id")));
+			proc.setInt(1, Integer.parseInt(map.get("user_id")));
+			proc.setInt(2, Integer.parseInt(map.get("list_id")));
 			proc.execute();
-			System.out.println("FAVS = " + proc.getInt(1));
 
 		} catch (PSQLException e) {
 			// TODO generate JSON error messages instead of console logs
-			if (e.getMessage().contains("unique constraint")) {
-				System.out.println("You already favorited this tweet");
-			}
-
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -52,4 +47,6 @@ public class FavoriteCommand implements Command, Runnable {
 	public void run() {
 		execute();
 	}
+
+
 }

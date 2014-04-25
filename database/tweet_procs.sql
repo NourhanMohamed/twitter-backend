@@ -1,8 +1,8 @@
 -- JAVA DONE
-CREATE OR REPLACE FUNCTION create_tweet(tweet_text varchar(140), creator_id integer, created_at timestamp)
+CREATE OR REPLACE FUNCTION create_tweet(tweet_text varchar(140), creator_id integer, created_at timestamp, image_url varchar(100) DEFAULT null)
 RETURNS void AS $$
   BEGIN
-    INSERT INTO tweets(tweet_text, creator_id, created_at) VALUES (tweet_text, creator_id, created_at);
+    INSERT INTO tweets(tweet_text, creator_id, created_at, image_url) VALUES (tweet_text, creator_id, created_at, image_url);
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -14,12 +14,43 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA DONE / JSON DONE
 CREATE OR REPLACE FUNCTION get_tweet(tweet_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT * FROM tweets T WHERE T.id = tweet_id ;
+    SELECT T.*, U.username, U.name, U.avatar_url, get_retweets_count(tweet_id) AS "retweets", get_favorites_count(tweet_id) AS "favorites"
+    FROM tweets T INNER JOIN users U ON T.creator_id = U.id
+    WHERE T.id = tweet_id;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+-- NOT USED
+CREATE OR REPLACE FUNCTION get_retweets(tweet_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT U.username, U.name, U.avatar_url
+    FROM retweets R INNER JOIN users U ON R.user_id = U.id
+    WHERE R.tweet_id = $1
+    LIMIT 6;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+-- NOT USED
+CREATE OR REPLACE FUNCTION get_favorites(tweet_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT U.username, U.name, U.avatar_url
+    FROM favorites F INNER JOIN users U ON F.user_id = U.id
+    WHERE F.tweet_id = $1
+    LIMIT 6;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
@@ -81,30 +112,6 @@ DECLARE res integer;
   BEGIN
     SELECT count(*) INTO res FROM favorites F WHERE F.tweet_id = $1;
     RETURN res;
-  END; $$
-LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION get_retweets(tweet_id integer)
-RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur';
-  BEGIN
-    OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
-    FROM retweets R INNER JOIN users U ON R.user_id = U.id
-    WHERE R.tweet_id = $1;
-    RETURN cursor;
-  END; $$
-LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION get_favorites(tweet_id integer)
-RETURNS refcursor AS $$
-DECLARE cursor refcursor := 'cur';
-  BEGIN
-    OPEN cursor FOR
-    SELECT U.username, U.name, U.avatar_file_name
-    FROM favorites F INNER JOIN users U ON F.user_id = U.id
-    WHERE F.tweet_id = $1;
-    RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
