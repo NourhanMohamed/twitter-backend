@@ -1,4 +1,4 @@
-package twitter.database.commands.lists;
+package twitter.database.commands.list;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -12,8 +12,8 @@ import org.postgresql.util.PSQLException;
 import twitter.database.Command;
 import twitter.database.PostgresConnection;
 
-public class DeleteMemberCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(DeleteMemberCommand.class
+public class SubscribeCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(SubscribeCommand.class
 			.getName());
 	private HashMap<String, String> map;
 	
@@ -29,14 +29,14 @@ public class DeleteMemberCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(true);
 			CallableStatement proc = dbConn
-					.prepareCall("{call delete_member(?,?)}");
+					.prepareCall("{call subscribe(?,?,now()::timestamp)}");
 			proc.setPoolable(true);
+
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
 			proc.setInt(2, Integer.parseInt(map.get("list_id")));
 			proc.execute();
 
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -48,5 +48,6 @@ public class DeleteMemberCommand implements Command, Runnable {
 		execute();
 	}
 
+	
 
 }

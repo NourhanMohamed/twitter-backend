@@ -1,4 +1,4 @@
-package twitter.database.commands.lists;
+package twitter.database.commands.list;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
