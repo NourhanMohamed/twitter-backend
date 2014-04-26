@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS lists CASCADE;
 
 CREATE TABLE lists(
   id serial PRIMARY KEY NOT NULL,
-  name varchar(50) NOT NULL,
+  name varchar(50) UNIQUE NOT NULL,
   description varchar(160),
   creator_id integer REFERENCES users(id) ON DELETE CASCADE,
   private boolean DEFAULT '0', -- public 0 and private 1
