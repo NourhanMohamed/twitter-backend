@@ -23,7 +23,7 @@ public class SubscribeCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(SubscribeCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -75,12 +75,10 @@ public class SubscribeCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();
 	}
-
-	
 
 }

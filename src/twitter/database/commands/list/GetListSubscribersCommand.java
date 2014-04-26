@@ -1,6 +1,5 @@
 package twitter.database.commands.list;
 
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -16,8 +15,8 @@ import twitter.database.Command;
 import twitter.database.PostgresConnection;
 
 public class GetListSubscribersCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(GetListSubscribersCommand.class
-			.getName());
+	private final Logger LOGGER = Logger
+			.getLogger(GetListSubscribersCommand.class.getName());
 	private HashMap<String, String> map;
 
 	@Override

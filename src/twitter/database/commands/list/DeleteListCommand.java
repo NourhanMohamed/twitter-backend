@@ -23,7 +23,7 @@ public class DeleteListCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(DeleteListCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -71,7 +71,7 @@ public class DeleteListCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();

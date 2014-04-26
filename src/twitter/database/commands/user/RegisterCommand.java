@@ -39,7 +39,7 @@ public class RegisterCommand implements Command, Runnable {
 			CallableStatement proc;
 			if (map.containsKey("avatar_url")) {
 				proc = dbConn
-						.prepareCall("{call create_user(?,?,?,?,now()::timestamp, ?)}");
+						.prepareCall("{call create_user(?,?,?,?,now()::timestamp,?)}");
 
 			} else {
 				proc = dbConn

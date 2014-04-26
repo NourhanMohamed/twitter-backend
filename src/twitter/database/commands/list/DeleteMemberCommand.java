@@ -23,7 +23,7 @@ public class DeleteMemberCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(DeleteMemberCommand.class
 			.getName());
 	private HashMap<String, String> map;
-	
+
 	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
@@ -69,11 +69,10 @@ public class DeleteMemberCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		execute();
 	}
-
 
 }
