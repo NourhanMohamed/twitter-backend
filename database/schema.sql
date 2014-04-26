@@ -111,8 +111,17 @@ CREATE TABLE direct_messages(
   dm_text varchar(140) NOT NULL CHECK (char_length(dm_text) <= 140),
   image_url varchar(100),
   read boolean DEFAULT '0', -- read 1 and unread 0
+  conv_id integer REFERENCES conversations(id) ON DELETE CASCADE,
   created_at timestamp NOT NULL
 );
+
+DROP TABLE IF EXISTS conversations CASCADE;
+
+CREATE TABLE conversations(
+  id serial PRIMARY KEY NOT NULL,
+  user_id integer REFERENCES users(id),
+  user2_id integer REFERENCES users(id)
+)
 
 DROP TABLE IF EXISTS replies CASCADE;
 
