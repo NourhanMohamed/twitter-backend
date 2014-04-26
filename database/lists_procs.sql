@@ -1,18 +1,17 @@
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION create_list(name varchar(50), description varchar(140),
 creator_id integer, private boolean, created_at timestamp)
 RETURNS void AS $$
 DECLARE list_id integer;
   BEGIN
     INSERT INTO lists(name, description, creator_id, private, created_at)
-    VALUES (name, description, creator_id, private, created_at);
+    VALUES (name, description, creator_id, private, created_at) RETURNING id INTO list_id;
 
-    SELECT L.id INTO list_id FROM lists L
-    WHERE L.name = $1 AND L.creator_id = $3;
-
-    SELECT subscribe(list_id, creator_id, created_at);
+    PERFORM subscribe(creator_id, list_id, created_at);
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION delete_list(list_id integer)
 RETURNS void AS $$
   BEGIN
@@ -20,16 +19,19 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION update_list(id integer, name varchar(50),
-  description varchar(140), private boolean)
+-- JAVA / JSON DONE
+CREATE OR REPLACE FUNCTION update_list(list_id integer, params TEXT[][2])
 RETURNS void AS $$
-  BEGIN
-    UPDATE lists L
-    SET name = $2, description = $3, private = $4
-    WHERE L.id = $1;
-  END; $$
+BEGIN
+  FOR i IN array_lower(params, 1)..array_upper(params, 1) LOOP
+    EXECUTE 'UPDATE lists' ||
+      ' SET ' || quote_ident(params[i][1]) || ' = ' || quote_literal(params[i][2]) ||
+      ' WHERE id = ' || list_id || ';';
+  END LOOP;
+END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION subscribe(user_id integer, list_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
@@ -38,6 +40,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION unsubscribe(user_id integer, list_id integer)
 RETURNS void AS $$
   BEGIN
@@ -46,7 +49,8 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION add_member(user_id integer, list_id integer)
+-- JAVA / JSON DONE
+CREATE OR REPLACE FUNCTION add_member(user_id integer, list_id integer, created_at timestamp)
 RETURNS void AS $$
   BEGIN
     INSERT INTO memberships(member_id, list_id, created_at)
@@ -54,11 +58,12 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION delete_member(user_id integer, list_id integer)
 RETURNS void AS $$
   BEGIN
     DELETE FROM memberships M
-    WHERE M.member_id = $1 AND S.list_id = $2;
+    WHERE M.member_id = $1 AND M.list_id = $2;
   END; $$
 LANGUAGE PLPGSQL;
 

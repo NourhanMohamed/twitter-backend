@@ -81,6 +81,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION mark_all_read()
 RETURNS void AS $$
   BEGIN
@@ -88,6 +89,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION mark_read(conversation_id integer)
 RETURNS void AS $$
   BEGIN
