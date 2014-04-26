@@ -5,7 +5,6 @@ import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -53,7 +52,6 @@ public class UpdateUserCommand implements Command, Runnable {
 			map.remove("app");
 			map.remove("method");
 			Set<Entry<String, String>> set = map.entrySet();
-			System.out.println(Arrays.toString(set.toArray()));
 			Iterator<Entry<String, String>> iterator = set.iterator();
 			String[][] arraySet = new String[set.size()][2];
 			int i = 0;
@@ -101,6 +99,7 @@ public class UpdateUserCommand implements Command, Runnable {
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
+			CommandsHelp.handleError(app, method, e.getMessage(), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
