@@ -1,19 +1,31 @@
 package twitter.database.commands.dm;
 
-
+import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.POJONode;
 import org.postgresql.util.PSQLException;
 
 import twitter.database.Command;
+import twitter.database.CommandsHelp;
+import twitter.database.Conversation;
+import twitter.database.DirectMessage;
 import twitter.database.PostgresConnection;
+import twitter.database.User;
+import twitter.shared.MyObjectMapper;
 
 public class GetConversationCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(GetConversationCommand.class
@@ -32,21 +44,62 @@ public class GetConversationCommand implements Command, Runnable {
 					.getConnection();
 			dbConn.setAutoCommit(false);
 			CallableStatement proc = dbConn
-					.prepareCall("{? = call get_conversation(?,?)}");
+					.prepareCall("{? = call get_conversation(?)}");
 			proc.setPoolable(true);
 			proc.registerOutParameter(1, Types.OTHER);
-			proc.setInt(1, Integer.parseInt(map.get("user_id")));
-			proc.setInt(2, Integer.parseInt(map.get("partner_id")));
+			proc.setInt(2, Integer.parseInt(map.get("conv_id")));
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
+
+			MyObjectMapper mapper = new MyObjectMapper();
+			JsonNodeFactory nf = JsonNodeFactory.instance;
+			ObjectNode root = nf.objectNode();
+			root.put("app", map.get("app"));
+			root.put("method", map.get("method"));
+			root.put("status", "ok");
+			root.put("code", "200");
+
+			Conversation conv = new Conversation();
+			ArrayList<DirectMessage> dms = new ArrayList<>();
 			while (set.next()) {
-				String sender_id = set.getString(1);
-				String reciever_id = set.getString(2);
-				String dm_text = set.getString(3);
-				String avatar_url = set.getString(4);
-				System.out.println("sender = " + sender_id + ", reciever = "
-						+ reciever_id + ", message = " + dm_text+", AvatarUrl = " + avatar_url);
+				int sender_id = set.getInt(1);
+				String sender_name = set.getString(2);
+				int reciever_id = set.getInt(3);
+				String reciever_name = set.getString(4);
+				String dm_text = set.getString(5);
+				String image_url = set.getString(6);
+				Timestamp created_at = set.getTimestamp(7);
+
+				User sender = new User();
+				sender.setId(sender_id);
+				sender.setName(sender_name);
+
+				User reciever = new User();
+				reciever.setId(reciever_id);
+				reciever.setName(reciever_name);
+
+				DirectMessage dm = new DirectMessage();
+				dm.setDmText(dm_text);
+				dm.setSender(sender);
+				dm.setReciever(reciever);
+				dm.setCreatedAt(created_at);
+				dm.setImageUrl(image_url);
+				dms.add(dm);
+			}
+
+			conv.setDms(dms);
+			POJONode child = nf.POJONode(conv);
+			root.put("conv", child);
+			try {
+				CommandsHelp.submit(map.get("app"),
+						mapper.writeValueAsString(root), LOGGER);
+			} catch (JsonGenerationException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (JsonMappingException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 			dbConn.commit();

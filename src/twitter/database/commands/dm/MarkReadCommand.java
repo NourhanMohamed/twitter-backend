@@ -19,8 +19,8 @@ import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
 import twitter.shared.MyObjectMapper;
 
-public class DeleteDmCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(DeleteDmCommand.class
+public class MarkReadCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger.getLogger(MarkReadCommand.class
 			.getName());
 	private HashMap<String, String> map;
 
@@ -35,10 +35,10 @@ public class DeleteDmCommand implements Command, Runnable {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn.prepareCall("{call delete_dm(?)}");
-			proc.setPoolable(true);
+			CallableStatement proc = dbConn.prepareCall("{call mark_read(?)}");
 
-			proc.setInt(1, Integer.parseInt(map.get("dm_id")));
+			proc.setPoolable(true);
+			proc.setInt(1, Integer.parseInt(map.get("conv_id")));
 			proc.execute();
 
 			MyObjectMapper mapper = new MyObjectMapper();
