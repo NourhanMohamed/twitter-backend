@@ -67,6 +67,7 @@ RETURNS void AS $$
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION get_list_subscribers(list_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -75,11 +76,12 @@ DECLARE cursor refcursor := 'cur';
     SELECT U.name, U.username, U.avatar_url
     FROM lists L INNER JOIN subscriptions S ON L.id = S.list_id
       INNER JOIN users U ON U.id = S.subscriber_id
-    WHERE L.id = list_id;
+    WHERE L.id = $1;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION get_list_members(list_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -88,9 +90,28 @@ DECLARE cursor refcursor := 'cur';
     SELECT U.name, U.username, U.avatar_url
     FROM lists L INNER JOIN memberships M ON L.id = M.list_id
       INNER JOIN users U ON U.id = M.member_id
-    WHERE L.id = list_id;
+    WHERE L.id = $1;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
 
--- Get list feeds
+-- JAVA / JSON DONE
+CREATE OR REPLACE FUNCTION get_list_feeds(list_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT id, tweet_text, image_url, created_at, name, username, avatar_url, name2
+    FROM (
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url, C.name AS "name2", T.created_at AS "creation"
+      FROM tweets T INNER JOIN users C ON T.creator_id = C.id INNER JOIN memberships M ON M.member_id = C.id
+      WHERE M.list_id = $1)
+      UNION
+      (SELECT T.id, T.tweet_text, T.image_url, T.created_at, C.name, C.username, C.avatar_url, U.name AS "name2", R.created_at AS "creation"
+      FROM tweets T INNER JOIN retweets R ON T.id = R.tweet_id INNER JOIN users C ON T.creator_id = C.id
+        INNER JOIN memberships M ON R.user_id = M.member_id INNER JOIN users U ON U.id = M.member_id
+      WHERE M.list_id = $1)) AS feeds
+    ORDER BY creation DESC;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
