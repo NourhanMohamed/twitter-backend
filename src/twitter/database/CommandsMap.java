@@ -14,6 +14,7 @@ import twitter.database.commands.list.AddMemberCommand;
 import twitter.database.commands.list.CreateListCommand;
 import twitter.database.commands.list.DeleteListCommand;
 import twitter.database.commands.list.DeleteMemberCommand;
+import twitter.database.commands.list.GetListFeedsCommand;
 import twitter.database.commands.list.GetListMembersCommand;
 import twitter.database.commands.list.GetListSubscribersCommand;
 import twitter.database.commands.list.SubscribeCommand;
@@ -89,6 +90,7 @@ public class CommandsMap {
 		cmdMap.put("subscribe", SubscribeCommand.class);
 		cmdMap.put("unsubscribe", UnSubscribeCommand.class);
 		cmdMap.put("update_list", UpdateListCommand.class);
+		cmdMap.put("get_list_feeds", GetListFeedsCommand.class);
 	}
 
 	public static Class<?> queryClass(String cmd) {
