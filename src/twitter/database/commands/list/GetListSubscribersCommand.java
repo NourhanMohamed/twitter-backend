@@ -1,5 +1,6 @@
 package twitter.database.commands.list;
 
+import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,10 +10,18 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
 
 import twitter.database.Command;
+import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
+import twitter.database.User;
+import twitter.shared.MyObjectMapper;
 
 public class GetListSubscribersCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger
@@ -34,23 +43,53 @@ public class GetListSubscribersCommand implements Command, Runnable {
 					.prepareCall("{? = call get_list_subscribers(?)}");
 			proc.setPoolable(true);
 			proc.registerOutParameter(1, Types.OTHER);
-			proc.setInt(1, Integer.parseInt(map.get("list_id")));
+			proc.setInt(2, Integer.parseInt(map.get("list_id")));
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
+			
+			MyObjectMapper mapper = new MyObjectMapper();
+			JsonNodeFactory nf = JsonNodeFactory.instance;
+			ObjectNode root = nf.objectNode();
+			ArrayNode usersArray = nf.arrayNode();
+			root.put("app", map.get("app"));
+			root.put("method", map.get("method"));
+			root.put("status", "ok");
+			root.put("code", "200");
+			
 			while (set.next()) {
-				String name = set.getString(1);
 				String username = set.getString(2);
-				String avatar = set.getString(3);
-				System.out.println("name = " + name + ", username = "
-						+ username + ", avatar = " + avatar);
+				String name = set.getString(1);
+				String avatar_url = set.getString(3);
+
+				User user = new User();
+				user.setUsername(username);
+				user.setName(name);
+				user.setAvatarUrl(avatar_url);
+
+				usersArray.addPOJO(user);
+			}
+			
+			root.put("subscribers", usersArray);
+			try {
+				CommandsHelp.submit(map.get("app"),
+						mapper.writeValueAsString(root), LOGGER);
+			} catch (JsonGenerationException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (JsonMappingException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 			dbConn.commit();
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
