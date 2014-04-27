@@ -79,7 +79,6 @@ CREATE TABLE lists(
   creator_id integer REFERENCES users(id) ON DELETE CASCADE,
   private boolean DEFAULT '0', -- public 0 and private 1
   created_at timestamp NOT NULL
-  -- how to store included tweeps and list subscribers?
 );
 
 DROP TABLE IF EXISTS subscriptions CASCADE;
