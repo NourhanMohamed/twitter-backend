@@ -24,7 +24,6 @@ BEGIN
 END; $$
 LANGUAGE PLPGSQL;
 
-
 -- JAVA DONE / JSON DONE
 CREATE OR REPLACE FUNCTION get_user(user_id integer)
 RETURNS refcursor AS $$
@@ -144,6 +143,7 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
+-- JAVA / JSON DONE
 CREATE OR REPLACE FUNCTION get_feeds(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
@@ -194,15 +194,28 @@ DECLARE cursor refcursor := 'cur';
   END; $$
 LANGUAGE PLPGSQL;
 
--- Should be changed to fetch my subscribed lists, too
-CREATE OR REPLACE FUNCTION get_user_lists(user_id integer)
+-- JAVA / JSON DONE
+CREATE OR REPLACE FUNCTION get_subscribed_lists(user_id integer)
 RETURNS refcursor AS $$
 DECLARE cursor refcursor := 'cur';
   BEGIN
     OPEN cursor FOR
-    SELECT L.id, L.name, L.description, U.name, U.username, U.avatar_url 
-    FROM lists L INNER JOIN users U ON L.creator_id = U.id
-    WHERE U.id = $1;
+    SELECT L.id, L.name, L.description, C.name, C.username, C.avatar_url 
+    FROM lists L INNER JOIN subscriptions S ON L.id = S.list_id INNER JOIN users C ON L.creator_id = C.id
+    WHERE S.subscriber_id = $1;
+    RETURN cursor;
+  END; $$
+LANGUAGE PLPGSQL;
+
+-- JAVA / JSON DONE
+CREATE OR REPLACE FUNCTION get_list_memberships(user_id integer)
+RETURNS refcursor AS $$
+DECLARE cursor refcursor := 'cur';
+  BEGIN
+    OPEN cursor FOR
+    SELECT L.id, L.name, L.description, C.name, C.username, C.avatar_url 
+    FROM lists L INNER JOIN memberships M ON L.id = M.list_id INNER JOIN users C ON L.creator_id = C.id
+    WHERE M.member_id = $1;
     RETURN cursor;
   END; $$
 LANGUAGE PLPGSQL;
