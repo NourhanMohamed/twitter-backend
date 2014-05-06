@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="libs/jackson-mapper-asl-1.9.13-javadoc.jar"/>
 	<classpathentry kind="lib" path="libs/jackson-mapper-asl-1.9.13.jar"/>
 	<classpathentry kind="lib" path="libs/postgresql-9.3-1101.jdbc41.jar"/>
+	<classpathentry kind="lib" path="libs/spymemcached-2.10.3-javadoc.jar"/>
+	<classpathentry kind="lib" path="libs/spymemcached-2.10.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
