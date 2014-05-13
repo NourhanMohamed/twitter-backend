@@ -37,7 +37,7 @@ public class ListMain {
 				Message msg = consumer.receive();
 				if (msg instanceof TextMessage) {
 					String msgTxt = ((TextMessage) msg).getText();
-					handleMsg(msgTxt);
+					handleMsg(msgTxt, msg.getJMSCorrelationID());
 				}
 			}
 
@@ -51,7 +51,7 @@ public class ListMain {
 		run = false;
 	}
 
-	private static void handleMsg(String msg) {
+	private static void handleMsg(String msg, String correlationID) {
 		JsonMapper json = new JsonMapper(msg);
 		HashMap<String, String> map = null;
 		try {
@@ -66,6 +66,7 @@ public class ListMain {
 		if (map != null) {
 			map.put("app", "list");
 			if (map.containsKey("method")) {
+				map.put("correlation_id", correlationID);
 				Class<?> cmdClass = CommandsMap.queryClass(map.get("method"));
 				if (cmdClass == null) {
 					LOGGER.log(Level.SEVERE,
