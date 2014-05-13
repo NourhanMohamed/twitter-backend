@@ -54,7 +54,8 @@ public class CreateListCommand implements Command, Runnable {
 			root.put("code", "200");
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -66,19 +67,22 @@ public class CreateListCommand implements Command, Runnable {
 			if (e.getMessage().contains("unique constraint")) {
 				if (e.getMessage().contains("(name)")) {
 					CommandsHelp.handleError(map.get("app"), map.get("method"),
-							"List name already exists", LOGGER);
+							"List name already exists",
+							map.get("correlation_id"), LOGGER);
 				}
 			}
 			if (e.getMessage().contains("value too long")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"Too long input", LOGGER);
+						"Too long input", map.get("correlation_id"), LOGGER);
 			}
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					"List name already exists", LOGGER);
+					"List name already exists", map.get("correlation_id"),
+					LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					"List name already exists", LOGGER);
+					"List name already exists", map.get("correlation_id"),
+					LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

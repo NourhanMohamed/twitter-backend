@@ -57,7 +57,8 @@ public class FavoriteCommand implements Command, Runnable {
 			root.put("favorites", favorites);
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -69,16 +70,17 @@ public class FavoriteCommand implements Command, Runnable {
 		} catch (PSQLException e) {
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"You already favorited this tweet", LOGGER);
+						"You already favorited this tweet",
+						map.get("correlation_id"), LOGGER);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), LOGGER);
+						e.getMessage(), map.get("correlation_id"), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

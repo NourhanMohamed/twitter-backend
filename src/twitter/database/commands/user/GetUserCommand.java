@@ -93,7 +93,8 @@ public class GetUserCommand implements Command, Runnable {
 			root.put("user", child);
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -105,11 +106,11 @@ public class GetUserCommand implements Command, Runnable {
 			dbConn.commit();
 		} catch (PSQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

@@ -37,6 +37,7 @@ public class UpdateListCommand implements Command, Runnable {
 	public void execute() {
 		String app = map.get("app");
 		String method = map.get("method");
+		String correlationID = map.get("correlation_id");
 		try {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
@@ -49,6 +50,7 @@ public class UpdateListCommand implements Command, Runnable {
 			map.remove("list_id");
 			map.remove("app");
 			map.remove("method");
+			map.remove("correlation_id");
 			Set<Entry<String, String>> set = map.entrySet();
 			Iterator<Entry<String, String>> iterator = set.iterator();
 			String[][] arraySet = new String[set.size()][2];
@@ -73,7 +75,7 @@ public class UpdateListCommand implements Command, Runnable {
 			root.put("code", "200");
 			try {
 				CommandsHelp.submit(app, mapper.writeValueAsString(root),
-						LOGGER);
+						correlationID, LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -86,17 +88,19 @@ public class UpdateListCommand implements Command, Runnable {
 			if (e.getMessage().contains("unique constraint")) {
 				if (e.getMessage().contains("(name)")) {
 					CommandsHelp.handleError(app, method,
-							"List name already exists", LOGGER);
+							"List name already exists", correlationID, LOGGER);
 				}
 			}
 			if (e.getMessage().contains("value too long")) {
-				CommandsHelp.handleError(app, method, "Too long input", LOGGER);
+				CommandsHelp.handleError(app, method, "Too long input",
+						correlationID, LOGGER);
 			}
 			CommandsHelp.handleError(app, method, "List name already exists",
-					LOGGER);
+					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
-			CommandsHelp.handleError(app, method, e.getMessage(), LOGGER);
+			CommandsHelp.handleError(app, method, e.getMessage(),
+					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

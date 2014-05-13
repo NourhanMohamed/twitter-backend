@@ -47,7 +47,7 @@ public class GetListMembersCommand implements Command, Runnable {
 			proc.execute();
 
 			ResultSet set = (ResultSet) proc.getObject(1);
-			
+
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
 			ObjectNode root = nf.objectNode();
@@ -56,7 +56,7 @@ public class GetListMembersCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
-			
+
 			while (set.next()) {
 				String username = set.getString(2);
 				String name = set.getString(1);
@@ -69,11 +69,12 @@ public class GetListMembersCommand implements Command, Runnable {
 
 				usersArray.addPOJO(user);
 			}
-			
+
 			root.put("members", usersArray);
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -85,11 +86,11 @@ public class GetListMembersCommand implements Command, Runnable {
 			dbConn.commit();
 		} catch (PSQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

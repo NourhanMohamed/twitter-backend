@@ -57,7 +57,8 @@ public class RetweetCommand implements Command, Runnable {
 			root.put("favorites", retweets);
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -70,16 +71,17 @@ public class RetweetCommand implements Command, Runnable {
 			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"You already retweeted this tweet", LOGGER);
+						"You already retweeted this tweet",
+						map.get("correlation_id"), LOGGER);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), LOGGER);
+						e.getMessage(), map.get("correlation_id"), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

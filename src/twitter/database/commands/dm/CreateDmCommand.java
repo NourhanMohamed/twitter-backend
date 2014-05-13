@@ -68,7 +68,8 @@ public class CreateDmCommand implements Command, Runnable {
 				root.put("code", "200");
 				try {
 					CommandsHelp.submit(map.get("app"),
-							mapper.writeValueAsString(root), LOGGER);
+							mapper.writeValueAsString(root),
+							map.get("correlation_id"), LOGGER);
 				} catch (JsonGenerationException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				} catch (JsonMappingException e) {
@@ -79,22 +80,23 @@ public class CreateDmCommand implements Command, Runnable {
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"You can not dm a user who is not following you",
-						LOGGER);
+						map.get("correlation_id"), LOGGER);
 			}
 
 		} catch (PSQLException e) {
 			if (e.getMessage().contains("value too long")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"DM length cannot exceed 140 character", LOGGER);
+						"DM length cannot exceed 140 character",
+						map.get("correlation_id"), LOGGER);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), LOGGER);
+						e.getMessage(), map.get("correlation_id"), LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

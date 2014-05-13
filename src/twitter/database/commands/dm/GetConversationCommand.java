@@ -93,7 +93,8 @@ public class GetConversationCommand implements Command, Runnable {
 			root.put("conv", child);
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -104,9 +105,12 @@ public class GetConversationCommand implements Command, Runnable {
 
 			dbConn.commit();
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

@@ -64,7 +64,8 @@ public class NewTweetCommand implements Command, Runnable {
 			root.put("code", "200");
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -77,15 +78,16 @@ public class NewTweetCommand implements Command, Runnable {
 			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("value too long")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"Tweet exceeds 140 characters", LOGGER);
+						"Tweet exceeds 140 characters",
+						map.get("correlation_id"), LOGGER);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), LOGGER);
+						e.getMessage(), map.get("correlation_id"), LOGGER);
 			}
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

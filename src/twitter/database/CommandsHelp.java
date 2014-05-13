@@ -17,7 +17,7 @@ import twitter.shared.MyObjectMapper;
 
 public class CommandsHelp {
 	public static void handleError(String app, String method, String errorMsg,
-			Logger logger) {
+			String correlationID, Logger logger) {
 		JsonNodeFactory nf = JsonNodeFactory.instance;
 		MyObjectMapper mapper = new MyObjectMapper();
 		ObjectNode node = nf.objectNode();
@@ -27,7 +27,7 @@ public class CommandsHelp {
 		node.put("code", "400");
 		node.put("message", errorMsg);
 		try {
-			submit(app, mapper.writeValueAsString(node), logger);
+			submit(app, mapper.writeValueAsString(node), correlationID, logger);
 		} catch (JsonGenerationException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		} catch (JsonMappingException e) {
@@ -37,11 +37,12 @@ public class CommandsHelp {
 		}
 	}
 
-	public static void submit(String app, String json, Logger logger) {
+	public static void submit(String app, String json, String correlationID,
+			Logger logger) {
 		Producer p = new Producer(new ActiveMQConfig(app.toUpperCase()
 				+ ".OUTQUEUE"));
 		try {
-			p.send(json);
+			p.send(json, correlationID);
 		} catch (JMSException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}

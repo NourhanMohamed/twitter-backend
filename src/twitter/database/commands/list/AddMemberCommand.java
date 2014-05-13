@@ -52,7 +52,8 @@ public class AddMemberCommand implements Command, Runnable {
 			root.put("code", "200");
 			try {
 				CommandsHelp.submit(map.get("app"),
-						mapper.writeValueAsString(root), LOGGER);
+						mapper.writeValueAsString(root),
+						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -63,15 +64,16 @@ public class AddMemberCommand implements Command, Runnable {
 		} catch (PSQLException e) {
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						"Membership already exists", LOGGER);
+						"Membership already exists", map.get("correlation_id"),
+						LOGGER);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), LOGGER);
+						e.getMessage(), map.get("correlation_id"), LOGGER);
 			}
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
-					e.getMessage(), LOGGER);
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

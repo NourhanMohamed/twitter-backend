@@ -37,6 +37,7 @@ public class UpdateUserCommand implements Command, Runnable {
 	public void execute() {
 		String app = map.get("app");
 		String method = map.get("method");
+		String correlationID = map.get("correlation_id");
 		try {
 			Connection dbConn = PostgresConnection.getDataSource()
 					.getConnection();
@@ -51,6 +52,7 @@ public class UpdateUserCommand implements Command, Runnable {
 			map.remove("user_id");
 			map.remove("app");
 			map.remove("method");
+			map.remove("correlation_id");
 			Set<Entry<String, String>> set = map.entrySet();
 			Iterator<Entry<String, String>> iterator = set.iterator();
 			String[][] arraySet = new String[set.size()][2];
@@ -76,7 +78,7 @@ public class UpdateUserCommand implements Command, Runnable {
 			root.put("code", "200");
 			try {
 				CommandsHelp.submit(app, mapper.writeValueAsString(root),
-						LOGGER);
+						correlationID, LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -89,17 +91,19 @@ public class UpdateUserCommand implements Command, Runnable {
 			if (e.getMessage().contains("unique constraint")) {
 				if (e.getMessage().contains("(username)"))
 					CommandsHelp.handleError(app, method,
-							"Username already exists", LOGGER);
+							"Username already exists", correlationID, LOGGER);
 				if (e.getMessage().contains("(email)"))
 					CommandsHelp.handleError(app, method,
-							"Email already exists", LOGGER);
+							"Email already exists", correlationID, LOGGER);
 			} else {
-				CommandsHelp.handleError(app, method, e.getMessage(), LOGGER);
+				CommandsHelp.handleError(app, method, e.getMessage(),
+						correlationID, LOGGER);
 			}
 
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
-			CommandsHelp.handleError(app, method, e.getMessage(), LOGGER);
+			CommandsHelp.handleError(app, method, e.getMessage(),
+					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
