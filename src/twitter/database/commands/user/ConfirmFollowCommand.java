@@ -23,6 +23,7 @@ public class ConfirmFollowCommand implements Command, Runnable {
 			.getName());
 	private HashMap<String, String> map;
 
+	@Override
 	public void setMap(HashMap<String, String> map) {
 		this.map = map;
 	}
