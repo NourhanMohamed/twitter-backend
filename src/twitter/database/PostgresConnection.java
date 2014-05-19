@@ -19,7 +19,6 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-
 public class PostgresConnection {
 	private static final Logger LOGGER = Logger
 			.getLogger(PostgresConnection.class.getName());
@@ -67,15 +66,9 @@ public class PostgresConnection {
 		}
 		if (conn != null) {
 			try {
-				System.out.println(conn.toString());
 				conn.close();
 			} catch (SQLException e) {
 			}
-		}
-		try {
-			printDriverStats();
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -106,7 +99,7 @@ public class PostgresConnection {
 			ObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(
 					poolableConnectionFactory, poolConfig);
 			poolableConnectionFactory.setPool(connectionPool);
-			
+
 			Class.forName("org.apache.commons.dbcp2.PoolingDriver");
 			dbDriver = (PoolingDriver) DriverManager
 					.getDriver("jdbc:apache:commons:dbcp:");
