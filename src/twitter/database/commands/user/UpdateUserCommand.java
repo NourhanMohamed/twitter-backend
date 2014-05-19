@@ -35,16 +35,16 @@ public class UpdateUserCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		String app = map.get("app");
 		String method = map.get("method");
 		String correlationID = map.get("correlation_id");
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
 
-			CallableStatement proc = dbConn
-					.prepareCall("{call edit_user(?,?)}");
+			proc = dbConn.prepareCall("{call edit_user(?,?)}");
 
 			proc.setPoolable(true);
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
@@ -105,6 +105,8 @@ public class UpdateUserCommand implements Command, Runnable {
 			CommandsHelp.handleError(app, method, e.getMessage(),
 					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

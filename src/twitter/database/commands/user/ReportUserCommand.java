@@ -31,11 +31,12 @@ public class ReportUserCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn
+			proc = dbConn
 					.prepareCall("{call report_user(?,?,now()::timestamp)}");
 			proc.setPoolable(true);
 
@@ -75,6 +76,8 @@ public class ReportUserCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

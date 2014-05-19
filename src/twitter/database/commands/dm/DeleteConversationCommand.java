@@ -31,12 +31,12 @@ public class DeleteConversationCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn
-					.prepareCall("{call delete_conversation(?)}");
+			proc = dbConn.prepareCall("{call delete_conversation(?)}");
 			proc.setPoolable(true);
 
 			proc.setInt(1, Integer.parseInt(map.get("conv_id")));
@@ -69,6 +69,8 @@ public class DeleteConversationCommand implements Command, Runnable {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

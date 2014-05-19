@@ -31,11 +31,12 @@ public class CreateListCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn
+			proc = dbConn
 					.prepareCall("{call create_list(?,?,?,?,now()::timestamp)}");
 			proc.setPoolable(true);
 
@@ -84,6 +85,8 @@ public class CreateListCommand implements Command, Runnable {
 					"List name already exists", map.get("correlation_id"),
 					LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

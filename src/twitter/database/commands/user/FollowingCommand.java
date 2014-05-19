@@ -35,12 +35,12 @@ public class FollowingCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(false);
-			CallableStatement proc = dbConn
-					.prepareCall("{? = call get_following(?)}");
+			proc = dbConn.prepareCall("{? = call get_following(?)}");
 			proc.setPoolable(true);
 			proc.registerOutParameter(1, Types.OTHER);
 			proc.setInt(2, Integer.parseInt(map.get("user_id")));
@@ -92,6 +92,8 @@ public class FollowingCommand implements Command, Runnable {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

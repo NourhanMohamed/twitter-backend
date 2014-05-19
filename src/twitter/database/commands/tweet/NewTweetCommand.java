@@ -31,11 +31,11 @@ public class NewTweetCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc;
 			if (map.containsKey("image_url")) {
 				proc = dbConn
 						.prepareCall("{call create_tweet(?,?,now()::timestamp,?)}");
@@ -75,7 +75,6 @@ public class NewTweetCommand implements Command, Runnable {
 			}
 
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("value too long")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"Tweet exceeds 140 characters",
@@ -89,6 +88,8 @@ public class NewTweetCommand implements Command, Runnable {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

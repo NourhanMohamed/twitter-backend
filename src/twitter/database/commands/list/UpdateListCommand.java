@@ -7,8 +7,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,12 +38,12 @@ public class UpdateListCommand implements Command, Runnable {
 		String app = map.get("app");
 		String method = map.get("method");
 		String correlationID = map.get("correlation_id");
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn
-					.prepareCall("{call update_list(?,?)}");
+			proc = dbConn.prepareCall("{call update_list(?,?)}");
 			proc.setPoolable(true);
 
 			proc.setInt(1, Integer.parseInt(map.get("list_id")));
@@ -102,6 +102,8 @@ public class UpdateListCommand implements Command, Runnable {
 			CommandsHelp.handleError(app, method, e.getMessage(),
 					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 

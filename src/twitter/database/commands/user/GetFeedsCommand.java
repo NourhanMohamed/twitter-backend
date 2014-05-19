@@ -37,18 +37,19 @@ public class GetFeedsCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
+		ResultSet set = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(false);
-			CallableStatement proc = dbConn
-					.prepareCall("{? = call get_feeds(?)}");
+			proc = dbConn.prepareCall("{? = call get_feeds(?)}");
 			proc.setPoolable(true);
 			proc.registerOutParameter(1, Types.OTHER);
 			proc.setInt(2, Integer.parseInt(map.get("user_id")));
 			proc.execute();
 
-			ResultSet set = (ResultSet) proc.getObject(1);
+			set = (ResultSet) proc.getObject(1);
 
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;
@@ -110,6 +111,8 @@ public class GetFeedsCommand implements Command, Runnable {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(set, proc, dbConn);
 		}
 	}
 

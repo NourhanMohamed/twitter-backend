@@ -32,11 +32,12 @@ public class RetweetCommand implements Command, Runnable {
 
 	@Override
 	public void execute() {
+		Connection dbConn = null;
+		CallableStatement proc = null;
 		try {
-			Connection dbConn = PostgresConnection.getDataSource()
-					.getConnection();
+			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			CallableStatement proc = dbConn
+			proc = dbConn
 					.prepareCall("{? = call retweet(?,?,now()::timestamp)}");
 			proc.setPoolable(true);
 
@@ -68,7 +69,6 @@ public class RetweetCommand implements Command, Runnable {
 			}
 
 		} catch (PSQLException e) {
-			// TODO generate JSON error messages instead of console logs
 			if (e.getMessage().contains("unique constraint")) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"You already retweeted this tweet",
@@ -83,6 +83,8 @@ public class RetweetCommand implements Command, Runnable {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} finally {
+			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 	}
 
