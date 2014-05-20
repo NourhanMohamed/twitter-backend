@@ -14,15 +14,14 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
 
-import twitter.database.BCrypt;
 import twitter.database.Command;
 import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
 import twitter.shared.MyObjectMapper;
 
-public class RegisterCommand implements Command, Runnable {
-	private final Logger LOGGER = Logger.getLogger(RegisterCommand.class
-			.getName());
+public class LogoutCommand implements Command, Runnable {
+	private final Logger LOGGER = Logger
+			.getLogger(LogoutCommand.class.getName());
 	private HashMap<String, String> map;
 
 	@Override
@@ -37,26 +36,10 @@ public class RegisterCommand implements Command, Runnable {
 		try {
 			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
-			String password = BCrypt.hashpw(map.get("password"), BCrypt.gensalt());
-			if (map.containsKey("avatar_url")) {
-				proc = dbConn
-						.prepareCall("{call create_user(?,?,?,?,now()::timestamp,?)}");
-
-			} else {
-				proc = dbConn
-						.prepareCall("{call create_user(?,?,?,?,now()::timestamp)}");
-			}
-
+			proc = dbConn.prepareCall("{call logout(?)}");
 			proc.setPoolable(true);
-			proc.setString(1, map.get("username"));
-			proc.setString(2, map.get("email"));
-			proc.setString(3, password);
-			proc.setString(4, map.get("name"));
 
-			if (map.containsKey("avatar_url")) {
-				proc.setString(5, map.get("avatar_url"));
-			}
-
+			proc.setInt(1, Integer.parseInt(map.get("user_id")));
 			proc.execute();
 
 			MyObjectMapper mapper = new MyObjectMapper();
@@ -66,6 +49,7 @@ public class RegisterCommand implements Command, Runnable {
 			root.put("method", map.get("method"));
 			root.put("status", "ok");
 			root.put("code", "200");
+
 			try {
 				CommandsHelp.submit(map.get("app"),
 						mapper.writeValueAsString(root),
@@ -79,22 +63,8 @@ public class RegisterCommand implements Command, Runnable {
 			}
 
 		} catch (PSQLException e) {
-			if (e.getMessage().contains("unique constraint")) {
-				if (e.getMessage().contains("(username)")) {
-					CommandsHelp.handleError(map.get("app"), map.get("method"),
-							"Username already exists",
-							map.get("correlation_id"), LOGGER);
-				}
-				if (e.getMessage().contains("(email)")) {
-					CommandsHelp.handleError(map.get("app"), map.get("method"),
-							"Email already exists", map.get("correlation_id"),
-							LOGGER);
-				}
-			} else {
-				CommandsHelp.handleError(map.get("app"), map.get("method"),
-						e.getMessage(), map.get("correlation_id"), LOGGER);
-			}
-
+			CommandsHelp.handleError(map.get("app"), map.get("method"),
+					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
 			CommandsHelp.handleError(map.get("app"), map.get("method"),

@@ -40,6 +40,8 @@ import twitter.database.commands.user.GetSubscribedListsCommand;
 import twitter.database.commands.user.GetTimelineCommand;
 import twitter.database.commands.user.GetUserCommand;
 import twitter.database.commands.user.GetUsersCommand;
+import twitter.database.commands.user.LoginCommand;
+import twitter.database.commands.user.LogoutCommand;
 import twitter.database.commands.user.RegisterCommand;
 import twitter.database.commands.user.ReportUserCommand;
 import twitter.database.commands.user.UnFollowCommand;
@@ -76,6 +78,8 @@ public class CommandsMap {
 		cmdMap.put("get_feeds", GetFeedsCommand.class);
 		cmdMap.put("get_subscribed_lists", GetSubscribedListsCommand.class);
 		cmdMap.put("get_list_memberships", GetListMembershipsCommand.class);
+		cmdMap.put("login", LoginCommand.class);
+		cmdMap.put("logout", LogoutCommand.class);
 
 		cmdMap.put("create_dm", CreateDmCommand.class);
 		cmdMap.put("delete_dm", DeleteDmCommand.class);

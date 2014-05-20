@@ -19,6 +19,7 @@ public class User {
 	private String link_color;
 	private String background_color;
 	private Boolean protected_tweets;
+	private String session_id;
 
 	public void setId(Integer id) {
 		this.id = id;
@@ -78,5 +79,9 @@ public class User {
 
 	public void setProtectedTweets(Boolean protected_tweets) {
 		this.protected_tweets = protected_tweets;
+	}
+	
+	public void setSessionID(String sessionID) {
+		this.session_id = sessionID;
 	}
 }

@@ -74,6 +74,7 @@ public class GetUserCommand implements Command, Runnable {
 				String link_color = set.getString(13);
 				String background_color = set.getString(14);
 				Boolean protected_tweets = set.getBoolean(15);
+				String session_id = set.getString(16);
 				user.setId(id);
 				user.setUsername(username);
 				user.setEmail(email);
@@ -88,6 +89,7 @@ public class GetUserCommand implements Command, Runnable {
 				user.setLinkColor(link_color);
 				user.setBackgroundColor(background_color);
 				user.setProtectedTweets(protected_tweets);
+				user.setSessionID(session_id);
 			}
 
 			POJONode child = nf.POJONode(user);
