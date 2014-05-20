@@ -252,3 +252,35 @@ DECLARE is_private boolean;
     RETURN is_private;
   END; $$
 LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION login(user_name varchar, session_id text)
+RETURNS void AS $$
+  BEGIN
+    UPDATE users SET session_id = $2 WHERE username = $1;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION logout(user_id integer)
+RETURNS void AS $$
+  BEGIN
+    UPDATE users SET session_id = null WHERE id = $1;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION is_logged_in(user_id integer)
+RETURNS integer AS $$
+DECLARE session_id integer;
+  BEGIN
+    SELECT U.session_id INTO session_id FROM users U WHERE U.id = $1;
+    RETURN session_id;
+  END; $$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION get_password_info(username varchar(30))
+RETURNS varchar AS $$
+DECLARE enc_password varchar;
+  BEGIN
+    SELECT U.encrypted_password INTO enc_password FROM users U WHERE U.username = $1;
+    RETURN enc_password;
+  END; $$
+LANGUAGE PLPGSQL;

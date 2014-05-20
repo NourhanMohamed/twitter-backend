@@ -15,7 +15,8 @@ CREATE TABLE users(
   overlay boolean DEFAULT '0', -- white 0 and black 1
   link_color varchar(10),
   background_color varchar(10),
-  protected_tweets boolean DEFAULT '0' -- public 0 and private 1
+  protected_tweets boolean DEFAULT '0', -- public 0 and private 1
+  session_id text
 );
 
 DROP TABLE IF EXISTS tweets CASCADE;
@@ -120,7 +121,7 @@ CREATE TABLE conversations(
   id serial PRIMARY KEY NOT NULL,
   user_id integer REFERENCES users(id),
   user2_id integer REFERENCES users(id)
-)
+);
 
 DROP TABLE IF EXISTS replies CASCADE;
 
