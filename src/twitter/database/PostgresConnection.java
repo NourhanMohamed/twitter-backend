@@ -94,7 +94,7 @@ public class PostgresConnection {
 			poolableConnectionFactory.setPoolStatements(true);
 
 			GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
-			poolConfig.setMaxIdle(Integer.parseInt(DB_MAX_CONNECTIONS));
+			poolConfig.setMaxIdle(Integer.parseInt(DB_INIT_CONNECTIONS));
 			poolConfig.setMaxTotal(Integer.parseInt(DB_MAX_CONNECTIONS));
 			ObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(
 					poolableConnectionFactory, poolConfig);
