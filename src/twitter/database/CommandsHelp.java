@@ -55,13 +55,13 @@ public class CommandsHelp {
 		}
 	}
 	
-	public static boolean isLoggedIn(int user_id, Logger lgr) {
+	public static String isLoggedIn(int user_id, Logger lgr) {
 		if(lgr == null) {
 			lgr = LOGGER;
 		}
 		Connection dbConn = null;
 		CallableStatement proc = null;
-		boolean loggedIn = false;
+		String sessionID = null;
 		try {
 			User user = null;
 			user = (User) MemcachedInstance.search(user_id+"");
@@ -76,13 +76,10 @@ public class CommandsHelp {
 				proc.setInt(2, user_id);
 				proc.execute();
 
-				String sessionID = proc.getString(1);
-				loggedIn = sessionID == null ? false : true;
+				sessionID = proc.getString(1);
 				user = new User();
 				user.setId(user_id);
 				user.setSessionID(sessionID);
-			} else {
-				loggedIn = user.sessionID() == null ? false : true;
 			}
 		} catch (PSQLException e) {
 			lgr.log(Level.SEVERE, e.getMessage(), e);
@@ -92,10 +89,6 @@ public class CommandsHelp {
 			PostgresConnection.disconnect(null, proc, dbConn);
 		}
 		
-		if (loggedIn) {
-			return true;
-		} else {
-			return false;
-		}
+		return sessionID;
 	}
 }
