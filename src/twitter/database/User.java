@@ -1,9 +1,11 @@
 package twitter.database;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @SuppressWarnings("unused")
-public class User {
+public class User implements Serializable{
+	private static final long serialVersionUID = -4464869016189052797L;
 	private Integer id;
 	private String username;
 	private String email;
@@ -83,5 +85,9 @@ public class User {
 	
 	public void setSessionID(String sessionID) {
 		this.session_id = sessionID;
+	}
+	
+	public String name(){
+		return this.name;
 	}
 }

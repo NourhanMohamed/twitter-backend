@@ -1,9 +1,11 @@
 package twitter.database;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @SuppressWarnings("unused")
-public class DirectMessage {
+public class DirectMessage implements Serializable{
+	private static final long serialVersionUID = 8006211619473600266L;
 	private Integer id;
 	private User sender;
 	private User reciever;

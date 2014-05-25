@@ -1,9 +1,11 @@
 package twitter.database;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @SuppressWarnings("unused")
-public class Tweet {
+public class Tweet implements Serializable{
+	private static final long serialVersionUID = -5391619002350308011L;
 	private Integer id;
 	private String tweet_text;
 	private String image_url;

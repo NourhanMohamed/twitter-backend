@@ -1,9 +1,11 @@
 package twitter.database;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @SuppressWarnings("unused")
-public class List {
+public class List implements Serializable{
+	private static final long serialVersionUID = -4273367157844887050L;
 	private Integer id;
 	private String name;
 	private String description;

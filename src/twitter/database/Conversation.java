@@ -1,9 +1,11 @@
 package twitter.database;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @SuppressWarnings("unused")
-public class Conversation {
+public class Conversation implements Serializable{
+	private static final long serialVersionUID = -1345693538512248332L;
 	private ArrayList<DirectMessage> dms;
 	private Integer id;
 	private DirectMessage lastDM;
