@@ -16,7 +16,7 @@ CREATE TABLE users(
   link_color varchar(10),
   background_color varchar(10),
   protected_tweets boolean DEFAULT '0', -- public 0 and private 1
-  session_id text
+  session_id varchar(100)
 );
 
 DROP TABLE IF EXISTS tweets CASCADE;

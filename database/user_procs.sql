@@ -253,10 +253,13 @@ DECLARE is_private boolean;
   END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION login(user_name varchar, session_id text)
-RETURNS void AS $$
+CREATE OR REPLACE FUNCTION login(user_name varchar, sessionID varchar)
+RETURNS integer AS $$
+DECLARE user_id integer;
   BEGIN
     UPDATE users SET session_id = $2 WHERE username = $1;
+    SELECT id INTO user_id FROM users WHERE username = $1;
+    RETURN user_id;
   END; $$
 LANGUAGE PLPGSQL;
 
@@ -268,8 +271,8 @@ RETURNS void AS $$
 LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION is_logged_in(user_id integer)
-RETURNS integer AS $$
-DECLARE session_id integer;
+RETURNS varchar AS $$
+DECLARE session_id varchar;
   BEGIN
     SELECT U.session_id INTO session_id FROM users U WHERE U.id = $1;
     RETURN session_id;
