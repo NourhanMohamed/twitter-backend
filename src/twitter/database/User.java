@@ -87,7 +87,7 @@ public class User implements Serializable{
 		this.session_id = sessionID;
 	}
 	
-	public String name(){
-		return this.name;
+	public String sessionID(){
+		return this.session_id;
 	}
 }
