@@ -30,6 +30,11 @@ public class TweetMain {
 		PostgresConnection.initSource();
 		CommandsMap.instantiate();
 		try {
+			new MemcachedInstance();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		try {
 			Consumer c = new Consumer(new ActiveMQConfig("TWEET.INQUEUE"));
 			MessageConsumer consumer = c.connect();
 
@@ -42,6 +47,7 @@ public class TweetMain {
 			}
 
 			c.disconnect();
+			MemcachedInstance.shutdownCache();
 		} catch (JMSException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
