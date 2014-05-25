@@ -17,6 +17,7 @@ import org.postgresql.util.PSQLException;
 import twitter.database.Command;
 import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
+import twitter.shared.MemcachedInstance;
 import twitter.shared.MyObjectMapper;
 
 public class LogoutCommand implements Command, Runnable {
@@ -41,6 +42,8 @@ public class LogoutCommand implements Command, Runnable {
 
 			proc.setInt(1, Integer.parseInt(map.get("user_id")));
 			proc.execute();
+			
+			MemcachedInstance.remove(map.get("user_id"));
 
 			MyObjectMapper mapper = new MyObjectMapper();
 			JsonNodeFactory nf = JsonNodeFactory.instance;

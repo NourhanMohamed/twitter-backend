@@ -22,6 +22,8 @@ import twitter.database.BCrypt;
 import twitter.database.Command;
 import twitter.database.CommandsHelp;
 import twitter.database.PostgresConnection;
+import twitter.database.User;
+import twitter.shared.MemcachedInstance;
 import twitter.shared.MyObjectMapper;
 
 public class LoginCommand implements Command, Runnable {
@@ -49,7 +51,7 @@ public class LoginCommand implements Command, Runnable {
 			proc.execute();
 
 			String enc_password = proc.getString(1);
-			
+
 			if (enc_password == null) {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"Invalid username", map.get("correlation_id"), LOGGER);
@@ -58,14 +60,20 @@ public class LoginCommand implements Command, Runnable {
 			dbConn.commit();
 			proc.close();
 
-			boolean authenticated = BCrypt.checkpw(map.get("password"), enc_password);
+			boolean authenticated = BCrypt.checkpw(map.get("password"),
+					enc_password);
 			if (authenticated) {
-				proc = dbConn.prepareCall("{call login(?,?)}");
+				proc = dbConn.prepareCall("{? = call login(?,?)}");
 				proc.setPoolable(true);
 
-				proc.setString(1, map.get("username"));
-				proc.setString(2, sessionID);
+				proc.registerOutParameter(1, Types.INTEGER);
+				proc.setString(2, map.get("username"));
+				proc.setString(3, sessionID);
 				proc.execute();
+
+				int userID = proc.getInt(1);
+
+				dbConn.commit();
 
 				MyObjectMapper mapper = new MyObjectMapper();
 				JsonNodeFactory nf = JsonNodeFactory.instance;
@@ -74,6 +82,7 @@ public class LoginCommand implements Command, Runnable {
 				root.put("method", map.get("method"));
 				root.put("status", "ok");
 				root.put("code", "200");
+				root.put("user_id", userID);
 				root.put("session_id", sessionID);
 
 				try {
@@ -87,6 +96,12 @@ public class LoginCommand implements Command, Runnable {
 				} catch (IOException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				}
+				
+				User u = new User();
+				u.setSessionID(sessionID);
+				u.setId(userID);
+				u.setUsername(map.get("username"));
+				MemcachedInstance.setOrReplace(userID + "", u);
 			} else {
 				CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"Invalid Password", map.get("correlation_id"), LOGGER);
