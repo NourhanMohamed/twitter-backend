@@ -16,6 +16,7 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
+import org.quickserver.net.server.ClientHandler;
 
 import twitter.database.Command;
 import twitter.database.CommandsHelp;
@@ -27,6 +28,12 @@ public class FollowingCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(FollowingCommand.class
 			.getName());
 	private HashMap<String, String> map;
+	private ClientHandler cmdHandler;
+
+	@Override
+	public void setCmdHandler(ClientHandler cmdHandler) {
+		this.cmdHandler = cmdHandler;
+	}
 
 	@Override
 	public void setMap(HashMap<String, String> map) {
@@ -37,6 +44,7 @@ public class FollowingCommand implements Command, Runnable {
 	public void execute() {
 		Connection dbConn = null;
 		CallableStatement proc = null;
+		String response = null;
 		try {
 			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(false);
@@ -72,7 +80,7 @@ public class FollowingCommand implements Command, Runnable {
 
 			root.put("following", usersArray);
 			try {
-				CommandsHelp.submit(map.get("app"),
+				response = CommandsHelp.submit(map.get("app"),
 						mapper.writeValueAsString(root),
 						map.get("correlation_id"), LOGGER);
 			} catch (JsonGenerationException e) {
@@ -85,15 +93,20 @@ public class FollowingCommand implements Command, Runnable {
 
 			dbConn.commit();
 		} catch (PSQLException e) {
-			CommandsHelp.handleError(map.get("app"), map.get("method"),
+			response = CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
-			CommandsHelp.handleError(map.get("app"), map.get("method"),
+			response = CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
 			PostgresConnection.disconnect(null, proc, dbConn);
+		}
+		try {
+			cmdHandler.sendClientMsg(response);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 

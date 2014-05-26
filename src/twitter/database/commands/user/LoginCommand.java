@@ -17,6 +17,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
+import org.quickserver.net.server.ClientHandler;
 
 import twitter.database.BCrypt;
 import twitter.database.Command;
@@ -28,6 +29,12 @@ public class LoginCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger
 			.getLogger(LoginCommand.class.getName());
 	private HashMap<String, String> map;
+	private ClientHandler cmdHandler;
+
+	@Override
+	public void setCmdHandler(ClientHandler cmdHandler) {
+		this.cmdHandler = cmdHandler;
+	}
 
 	@Override
 	public void setMap(HashMap<String, String> map) {
@@ -38,6 +45,7 @@ public class LoginCommand implements Command, Runnable {
 	public void execute() {
 		Connection dbConn = null;
 		CallableStatement proc = null;
+		String response = null;
 		try {
 			String sessionID = URLEncoder.encode(new UID().toString(), "UTF-8");
 			dbConn = PostgresConnection.getDataSource().getConnection();
@@ -77,7 +85,7 @@ public class LoginCommand implements Command, Runnable {
 				root.put("session_id", sessionID);
 
 				try {
-					CommandsHelp.submit(map.get("app"),
+					response = CommandsHelp.submit(map.get("app"),
 							mapper.writeValueAsString(root),
 							map.get("correlation_id"), LOGGER);
 				} catch (JsonGenerationException e) {
@@ -88,22 +96,27 @@ public class LoginCommand implements Command, Runnable {
 					LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				}
 			} else {
-				CommandsHelp.handleError(map.get("app"), map.get("method"),
+				response = CommandsHelp.handleError(map.get("app"), map.get("method"),
 						"Invalid Password", map.get("correlation_id"), LOGGER);
 			}
 
 		} catch (PSQLException e) {
-			CommandsHelp.handleError(map.get("app"), map.get("method"),
+			response = CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
-			CommandsHelp.handleError(map.get("app"), map.get("method"),
+			response = CommandsHelp.handleError(map.get("app"), map.get("method"),
 					e.getMessage(), map.get("correlation_id"), LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
 			PostgresConnection.disconnect(null, proc, dbConn);
+		}
+		try {
+			cmdHandler.sendClientMsg(response);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 

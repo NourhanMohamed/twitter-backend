@@ -17,6 +17,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.postgresql.util.PSQLException;
+import org.quickserver.net.server.ClientHandler;
 
 import twitter.database.Command;
 import twitter.database.CommandsHelp;
@@ -27,6 +28,12 @@ public class UpdateListCommand implements Command, Runnable {
 	private final Logger LOGGER = Logger.getLogger(UpdateListCommand.class
 			.getName());
 	private HashMap<String, String> map;
+	private ClientHandler cmdHandler;
+
+	@Override
+	public void setCmdHandler(ClientHandler cmdHandler) {
+		this.cmdHandler = cmdHandler;
+	}
 
 	@Override
 	public void setMap(HashMap<String, String> map) {
@@ -40,6 +47,7 @@ public class UpdateListCommand implements Command, Runnable {
 		String correlationID = map.get("correlation_id");
 		Connection dbConn = null;
 		CallableStatement proc = null;
+		String response = null;
 		try {
 			dbConn = PostgresConnection.getDataSource().getConnection();
 			dbConn.setAutoCommit(true);
@@ -74,7 +82,7 @@ public class UpdateListCommand implements Command, Runnable {
 			root.put("status", "ok");
 			root.put("code", "200");
 			try {
-				CommandsHelp.submit(app, mapper.writeValueAsString(root),
+				response = CommandsHelp.submit(app, mapper.writeValueAsString(root),
 						correlationID, LOGGER);
 			} catch (JsonGenerationException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -87,15 +95,15 @@ public class UpdateListCommand implements Command, Runnable {
 		} catch (PSQLException e) {
 			if (e.getMessage().contains("unique constraint")) {
 				if (e.getMessage().contains("(name)")) {
-					CommandsHelp.handleError(app, method,
+					response = CommandsHelp.handleError(app, method,
 							"List name already exists", correlationID, LOGGER);
 				}
 			}
 			if (e.getMessage().contains("value too long")) {
-				CommandsHelp.handleError(app, method, "Too long input",
+				response = CommandsHelp.handleError(app, method, "Too long input",
 						correlationID, LOGGER);
 			}
-			CommandsHelp.handleError(app, method, "List name already exists",
+			response = CommandsHelp.handleError(app, method, "List name already exists",
 					correlationID, LOGGER);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (SQLException e) {
@@ -104,6 +112,11 @@ public class UpdateListCommand implements Command, Runnable {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
 			PostgresConnection.disconnect(null, proc, dbConn);
+		}
+		try {
+			cmdHandler.sendClientMsg(response);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
