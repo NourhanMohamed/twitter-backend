@@ -35,5 +35,14 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/TwitterBackend/libs/spymemcached-2.10.3-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/QuickServer.jar"/>
+	<classpathentry kind="lib" path="libs/QuickServerClient.jar"/>
+	<classpathentry kind="lib" path="libs/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="libs/commons-collections.jar"/>
+	<classpathentry kind="lib" path="libs/commons-digester.jar"/>
+	<classpathentry kind="lib" path="libs/commons-logging.jar"/>
+	<classpathentry kind="lib" path="libs/commons-pool.jar"/>
+	<classpathentry kind="lib" path="libs/metouia.jar"/>
+	<classpathentry kind="lib" path="libs/QSAdminGUI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
