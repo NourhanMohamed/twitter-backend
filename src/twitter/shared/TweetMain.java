@@ -13,7 +13,7 @@ public class TweetMain {
 	public static void main(String[] args) {
 		PostgresConnection.initSource();
 		CommandsMap.instantiate();
-		QuickServer myServer = new QuickServer("twitter.shared.TweetCommandHandler",5050);
+		QuickServer myServer = new QuickServer("twitter.shared.TweetCommandHandler",5051);
 		myServer.setName("TweetServer");
 		try {
 			myServer.startServer();

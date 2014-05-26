@@ -13,7 +13,7 @@ public class ListMain {
 	public static void main(String[] args) {
 		PostgresConnection.initSource();
 		CommandsMap.instantiate();
-		QuickServer myServer = new QuickServer("twitter.shared.ListCommandHandler",5050);
+		QuickServer myServer = new QuickServer("twitter.shared.ListCommandHandler",5052);
 		myServer.setName("ListServer");
 		try {
 			myServer.startServer();

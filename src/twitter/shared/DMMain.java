@@ -13,7 +13,7 @@ public class DMMain {
 	public static void main(String[] args) {
 		PostgresConnection.initSource();
 		CommandsMap.instantiate();
-		QuickServer myServer = new QuickServer("twitter.shared.DMCommandHandler",5050);
+		QuickServer myServer = new QuickServer("twitter.shared.DMCommandHandler",5053);
 		myServer.setName("DMServer");
 		try {
 			myServer.startServer();
