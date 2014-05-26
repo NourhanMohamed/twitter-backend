@@ -4,19 +4,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.JMSException;
-
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
-import twitter.activemq.ActiveMQConfig;
-import twitter.activemq.Producer;
 import twitter.shared.MyObjectMapper;
 
 public class CommandsHelp {
-	public static void handleError(String app, String method, String errorMsg,
+	public static String handleError(String app, String method, String errorMsg,
 			String correlationID, Logger logger) {
 		JsonNodeFactory nf = JsonNodeFactory.instance;
 		MyObjectMapper mapper = new MyObjectMapper();
@@ -26,8 +22,9 @@ public class CommandsHelp {
 		node.put("status", "Bad Request");
 		node.put("code", "400");
 		node.put("message", errorMsg);
+		node.put("correlation-id", correlationID);
 		try {
-			submit(app, mapper.writeValueAsString(node), correlationID, logger);
+			return submit(app, mapper.writeValueAsString(node), correlationID, logger);
 		} catch (JsonGenerationException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		} catch (JsonMappingException e) {
@@ -35,16 +32,11 @@ public class CommandsHelp {
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
+		return null;
 	}
 
-	public static void submit(String app, String json, String correlationID,
+	public static String submit(String app, String json, String correlationID,
 			Logger logger) {
-		Producer p = new Producer(new ActiveMQConfig(app.toUpperCase()
-				+ ".OUTQUEUE"));
-		try {
-			p.send(json, correlationID);
-		} catch (JMSException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		}
+		return json;
 	}
 }
