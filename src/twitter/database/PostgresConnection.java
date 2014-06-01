@@ -25,8 +25,8 @@ public class PostgresConnection {
 	private static final String DB_USERNAME = "nour";
 	private static final String DB_PASSWORD = "";
 	private static final String DB_NAME = "twitter";
-	private static final String DB_INIT_CONNECTIONS = "10";
-	private static final String DB_MAX_CONNECTIONS = "15";
+	private static final String DB_INIT_CONNECTIONS = "50";
+	private static final String DB_MAX_CONNECTIONS = "50";
 	private static final String URI = "jdbc:postgresql://localhost:5432/"
 			+ DB_NAME;
 	private static PoolingDriver dbDriver;
