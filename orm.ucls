@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.6" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
+  realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
+  <class id="1" language="java" name="twitter.database.Conversation" project="TwitterBackend" 
+    file="/TwitterBackend/src/twitter/database/Conversation.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="158" y="82"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="twitter.database.Tweet" project="TwitterBackend" 
+    file="/TwitterBackend/src/twitter/database/Tweet.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="673" y="470"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="twitter.database.User" project="TwitterBackend" 
+    file="/TwitterBackend/src/twitter/database/User.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="351" y="513"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="twitter.database.DirectMessage" project="TwitterBackend" 
+    file="/TwitterBackend/src/twitter/database/DirectMessage.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="632" y="118"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="twitter.database.List" project="TwitterBackend" 
+    file="/TwitterBackend/src/twitter/database/List.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="103" y="418"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <association id="6">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="7" name="sender">        
+        <position height="18" width="46" x="459" y="244"/>      
+      </attribute>      
+      <multiplicity id="8" minimum="0" maximum="1">        
+        <position height="16" width="25" x="460" y="266"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="9">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="10" name="lastDM">        
+        <position height="18" width="46" x="490" y="79"/>      
+      </attribute>      
+      <multiplicity id="11" minimum="0" maximum="1">        
+        <position height="16" width="25" x="503" y="92"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="12">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="13" name="dms">        
+        <position height="18" width="31" x="484" y="109"/>      
+      </attribute>      
+      <multiplicity id="14" minimum="0" maximum="2147483647">        
+        <position height="16" width="23" x="498" y="129"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="15">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="16" name="reciever">        
+        <position height="18" width="52" x="494" y="322"/>      
+      </attribute>      
+      <multiplicity id="17" minimum="0" maximum="1">        
+        <position height="16" width="25" x="475" y="339"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="18">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="19" name="favoriter">        
+        <position height="18" width="52" x="463" y="535"/>      
+      </attribute>      
+      <multiplicity id="20" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="21">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="22" name="retweeter">        
+        <position height="18" width="59" x="465" y="442"/>      
+      </attribute>      
+      <multiplicity id="23" minimum="0" maximum="1">        
+        <position height="16" width="25" x="466" y="457"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="24">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="25" name="creator">        
+        <position height="18" width="46" x="499" y="492"/>      
+      </attribute>      
+      <multiplicity id="26" minimum="0" maximum="1">        
+        <position height="16" width="25" x="475" y="493"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="27">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="28" name="creator">        
+        <position height="18" width="46" x="200" y="437"/>      
+      </attribute>      
+      <multiplicity id="29" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
