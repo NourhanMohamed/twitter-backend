@@ -62,12 +62,11 @@ public class LoginCommand implements Command, Runnable {
 			if (authenticated) {
 				proc = dbConn.prepareCall("{call login(?,?)}");
 				proc.setPoolable(true);
-				proc.registerOutParameter(1, Types.INTEGER);
+
 				proc.setString(1, map.get("username"));
 				proc.setString(2, sessionID);
 				proc.execute();
-				
-				Integer useid = (Integer)proc.getInt(1);
+
 				MyObjectMapper mapper = new MyObjectMapper();
 				JsonNodeFactory nf = JsonNodeFactory.instance;
 				ObjectNode root = nf.objectNode();
@@ -75,7 +74,6 @@ public class LoginCommand implements Command, Runnable {
 				root.put("method", map.get("method"));
 				root.put("status", "ok");
 				root.put("code", "200");
-				root.put("useid", useid);
 				root.put("session_id", sessionID);
 
 				try {
@@ -114,4 +112,3 @@ public class LoginCommand implements Command, Runnable {
 		execute();
 	}
 }
-

@@ -253,16 +253,10 @@ DECLARE is_private boolean;
   END; $$
 LANGUAGE PLPGSQL;
 
--- Youssef: changed it to return user's id on login , because it is needed for all user's procedures
-DROP FUNCTION login(user_name varchar, session_id text);
-
 CREATE OR REPLACE FUNCTION login(user_name varchar, session_id text)
-RETURNS integer AS $$
-DECLARE use_id integer;
+RETURNS void AS $$
   BEGIN
     UPDATE users SET session_id = $2 WHERE username = $1;
-    SELECT U.id INTO use_id FROM USERS U WHERE U.username = $1;
-    RETURN use_id;
   END; $$
 LANGUAGE PLPGSQL;
 
